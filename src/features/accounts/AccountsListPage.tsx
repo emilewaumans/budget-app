@@ -45,7 +45,7 @@ export default function AccountsListPage() {
           {accounts?.length === 0 && <li className="list-empty">No accounts yet</li>}
         </ul>
       </div>
-      <Link to="/accounts/new" className="fab" aria-label="Add account">
+      <Link to="/accounts/new" className="fab fab--above-nav" aria-label="Add account">
         +
       </Link>
     </div>

@@ -4,8 +4,8 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { MoneyInput } from '../../components/MoneyInput'
 import { PageHeader } from '../../components/PageHeader'
 import { db } from '../../db/db'
-import { centsToInputString, parseToCents } from '../../lib/money'
 import { todayISO } from '../../lib/dates'
+import { centsToInputString, parseToCents } from '../../lib/money'
 
 type TransactionKind = 'expense' | 'income'
 
@@ -19,11 +19,15 @@ export default function TransactionFormPage() {
   const [payee, setPayee] = useState('')
   const [date, setDate] = useState(todayISO())
   const [memo, setMemo] = useState('')
+  const [categoryId, setCategoryId] = useState('')
 
   const payeeSuggestions = useLiveQuery(async () => {
     const all = await db.transactions.orderBy('date').reverse().toArray()
     return Array.from(new Set(all.map((t) => t.payee).filter(Boolean)))
   }, [])
+
+  const groups = useLiveQuery(() => db.categoryGroups.orderBy('sortOrder').toArray(), [])
+  const categories = useLiveQuery(() => db.categories.orderBy('sortOrder').toArray(), [])
 
   useEffect(() => {
     if (!transactionId) return
@@ -35,6 +39,9 @@ export default function TransactionFormPage() {
       setDate(transaction.date)
       setMemo(transaction.memo)
     })
+    db.splits.where('transactionId').equals(transactionId).first().then((split) => {
+      if (split) setCategoryId(split.categoryId)
+    })
   }, [transactionId])
 
   async function handleSubmit(e: React.FormEvent) {
@@ -44,6 +51,7 @@ export default function TransactionFormPage() {
     const magnitude = Math.abs(parseToCents(amount))
     const amountCents = kind === 'expense' ? -magnitude : magnitude
 
+    let id = transactionId
     if (isEditing && transactionId) {
       await db.transactions.update(transactionId, {
         date,
@@ -52,8 +60,9 @@ export default function TransactionFormPage() {
         amountCents,
       })
     } else {
+      id = crypto.randomUUID()
       await db.transactions.add({
-        id: crypto.randomUUID(),
+        id,
         accountId,
         date,
         payee: payee.trim(),
@@ -62,11 +71,34 @@ export default function TransactionFormPage() {
         amountCents,
       })
     }
+
+    // Every transaction has at most one split for now (multi-category splits arrive later) —
+    // an expense with a category gets exactly one split row; anything else gets none.
+    if (id) {
+      const existingSplit = await db.splits.where('transactionId').equals(id).first()
+      if (kind === 'expense' && categoryId) {
+        if (existingSplit) {
+          await db.splits.update(existingSplit.id, { categoryId, amountCents })
+        } else {
+          await db.splits.add({
+            id: crypto.randomUUID(),
+            transactionId: id,
+            categoryId,
+            amountCents,
+            memo: '',
+          })
+        }
+      } else if (existingSplit) {
+        await db.splits.delete(existingSplit.id)
+      }
+    }
+
     navigate(-1)
   }
 
   async function handleDelete() {
     if (!transactionId) return
+    await db.splits.where('transactionId').equals(transactionId).delete()
     await db.transactions.delete(transactionId)
     navigate(-1)
   }
@@ -113,6 +145,26 @@ export default function TransactionFormPage() {
           <label htmlFor="date">Date</label>
           <input id="date" type="date" value={date} onChange={(e) => setDate(e.target.value)} required />
         </div>
+
+        {kind === 'expense' && (
+          <div className="field">
+            <label htmlFor="category">Category</label>
+            <select id="category" value={categoryId} onChange={(e) => setCategoryId(e.target.value)}>
+              <option value="">— Uncategorized —</option>
+              {groups?.map((group) => (
+                <optgroup key={group.id} label={group.name}>
+                  {categories
+                    ?.filter((c) => c.groupId === group.id)
+                    .map((category) => (
+                      <option key={category.id} value={category.id}>
+                        {category.name}
+                      </option>
+                    ))}
+                </optgroup>
+              ))}
+            </select>
+          </div>
+        )}
 
         <div className="field">
           <label htmlFor="memo">Memo (optional)</label>

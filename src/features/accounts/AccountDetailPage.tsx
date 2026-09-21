@@ -17,6 +17,22 @@ export default function AccountDetailPage() {
     return rows.sort((a, b) => b.date.localeCompare(a.date))
   }, [accountId])
 
+  const categoryNameByTransactionId = useLiveQuery(async () => {
+    if (!transactions || transactions.length === 0) return new Map<string, string>()
+    const transactionIds = transactions.map((t) => t.id)
+    const [splits, categories] = await Promise.all([
+      db.splits.where('transactionId').anyOf(transactionIds).toArray(),
+      db.categories.toArray(),
+    ])
+    const categoryNameById = new Map(categories.map((c) => [c.id, c.name]))
+    const result = new Map<string, string>()
+    for (const split of splits) {
+      const name = categoryNameById.get(split.categoryId)
+      if (name) result.set(split.transactionId, name)
+    }
+    return result
+  }, [transactions])
+
   if (!accountId || account === undefined) return null
 
   if (account === null) {
@@ -48,7 +64,9 @@ export default function AccountDetailPage() {
               <Link className="list-item" to={`/accounts/${accountId}/transactions/${t.id}/edit`}>
                 <span>
                   <div className="list-item__title">{t.payee}</div>
-                  <div className="list-item__subtitle">{t.date}</div>
+                  <div className="list-item__subtitle">
+                    {t.date} · {categoryNameByTransactionId?.get(t.id) ?? (t.amountCents > 0 ? 'Income' : 'Uncategorized')}
+                  </div>
                 </span>
                 <span className={t.amountCents < 0 ? 'amount-negative' : 'amount-positive'}>
                   {formatCents(t.amountCents)}
