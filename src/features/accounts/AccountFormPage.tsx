@@ -2,11 +2,13 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { ColorSwatchPicker } from '../../components/ColorSwatchPicker'
 import { MoneyInput } from '../../components/MoneyInput'
 import { PageHeader } from '../../components/PageHeader'
 import { db } from '../../db/db'
 import type { AccountType } from '../../db/types'
 import { centsToInputString, parseToCents } from '../../lib/money'
+import { ACCOUNT_COLORS, nextAccountColor } from './accountColors'
 import { ACCOUNT_TYPE_OPTIONS } from './accountTypes'
 
 export default function AccountFormPage() {
@@ -18,7 +20,16 @@ export default function AccountFormPage() {
   const [type, setType] = useState<AccountType>('checking')
   const [startingBalance, setStartingBalance] = useState('0,00')
   const [closed, setClosed] = useState(false)
+  const [color, setColor] = useState(ACCOUNT_COLORS[0])
   const [confirmingDelete, setConfirmingDelete] = useState(false)
+
+  const accountCount = useLiveQuery(() => db.accounts.count(), [])
+
+  useEffect(() => {
+    if (!isEditing && accountCount !== undefined) {
+      setColor(nextAccountColor(accountCount))
+    }
+  }, [isEditing, accountCount])
 
   const transactionCount = useLiveQuery(
     () => (accountId ? db.transactions.where('accountId').equals(accountId).count() : 0),
@@ -33,6 +44,7 @@ export default function AccountFormPage() {
       setType(account.type)
       setStartingBalance(centsToInputString(account.startingBalanceCents))
       setClosed(account.closed)
+      setColor(account.color ?? ACCOUNT_COLORS[0])
     })
   }, [accountId])
 
@@ -46,6 +58,7 @@ export default function AccountFormPage() {
         type,
         startingBalanceCents: parseToCents(startingBalance),
         closed,
+        color,
       })
     } else {
       const count = await db.accounts.count()
@@ -56,6 +69,7 @@ export default function AccountFormPage() {
         startingBalanceCents: parseToCents(startingBalance),
         closed: false,
         sortOrder: count,
+        color,
       })
     }
     navigate(-1)
@@ -105,6 +119,11 @@ export default function AccountFormPage() {
           value={startingBalance}
           onChange={setStartingBalance}
         />
+
+        <div className="field">
+          <label>Color</label>
+          <ColorSwatchPicker colors={ACCOUNT_COLORS} value={color} onChange={setColor} />
+        </div>
 
         {isEditing && (
           <div className="field">

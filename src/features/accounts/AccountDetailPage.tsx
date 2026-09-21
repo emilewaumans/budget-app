@@ -4,6 +4,9 @@ import { Link, useParams } from 'react-router-dom'
 import { PageHeader } from '../../components/PageHeader'
 import { db } from '../../db/db'
 import { formatCents } from '../../lib/money'
+import { useCategoryLabels } from '../transactions/useCategoryLabels'
+import { ACCOUNT_COLORS } from './accountColors'
+import { ACCOUNT_TYPE_ICONS } from './accountTypes'
 import { computeAccountBalance } from './balance'
 
 export default function AccountDetailPage() {
@@ -18,31 +21,7 @@ export default function AccountDetailPage() {
     return rows.sort((a, b) => b.date.localeCompare(a.date))
   }, [accountId])
 
-  const categoryLabelByTransactionId = useLiveQuery(async () => {
-    if (!transactions || transactions.length === 0) return new Map<string, string>()
-    const transactionIds = transactions.map((t) => t.id)
-    const [splits, categories] = await Promise.all([
-      db.splits.where('transactionId').anyOf(transactionIds).toArray(),
-      db.categories.toArray(),
-    ])
-    const categoryNameById = new Map(categories.map((c) => [c.id, c.name]))
-    const splitsByTransactionId = new Map<string, typeof splits>()
-    for (const split of splits) {
-      const list = splitsByTransactionId.get(split.transactionId) ?? []
-      list.push(split)
-      splitsByTransactionId.set(split.transactionId, list)
-    }
-    const result = new Map<string, string>()
-    for (const [transactionId, txSplits] of splitsByTransactionId) {
-      if (txSplits.length > 1) {
-        result.set(transactionId, 'Split')
-      } else {
-        const name = categoryNameById.get(txSplits[0].categoryId)
-        if (name) result.set(transactionId, name)
-      }
-    }
-    return result
-  }, [transactions])
+  const categoryLabelByTransactionId = useCategoryLabels(transactions)
 
   if (!accountId || account === undefined) return null
 
@@ -55,14 +34,21 @@ export default function AccountDetailPage() {
   }
 
   const balance = computeAccountBalance(account, transactions ?? [])
+  const color = account.color ?? ACCOUNT_COLORS[0]
+  const AccountIcon = ACCOUNT_TYPE_ICONS[account.type]
 
   return (
     <div className="page">
       <PageHeader title={account.name} back />
       <div className="page-body">
-        <div>
-          <div className="list-item__subtitle">Balance</div>
-          <h2 className={balance < 0 ? 'amount-negative' : undefined}>{formatCents(balance)}</h2>
+        <div className="account-summary">
+          <span className="list-item__icon" style={{ background: `${color}22`, color }}>
+            <AccountIcon size={22} />
+          </span>
+          <div>
+            <div className="list-item__subtitle">Balance</div>
+            <h2 className={balance < 0 ? 'amount-negative' : undefined}>{formatCents(balance)}</h2>
+          </div>
         </div>
 
         <Link to={`/accounts/${accountId}/edit`} className="btn">

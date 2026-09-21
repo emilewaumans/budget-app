@@ -7,7 +7,9 @@ import BudgetPage from './features/budget/BudgetPage'
 import CategoriesPage from './features/categories/CategoriesPage'
 import CategoryFormPage from './features/categories/CategoryFormPage'
 import CategoryGroupFormPage from './features/categories/CategoryGroupFormPage'
+import HomePage from './features/home/HomePage'
 import { AppLock } from './features/lock/LockContext'
+import MorePage from './features/more/MorePage'
 import ReportsPage from './features/reports/ReportsPage'
 import RuleFormPage from './features/rules/RuleFormPage'
 import RulesPage from './features/rules/RulesPage'
@@ -20,13 +22,17 @@ function App() {
       <HashRouter>
         <Routes>
           <Route element={<MainLayout />}>
-            <Route path="/" element={<Navigate to="/budget" replace />} />
+            <Route path="/" element={<Navigate to="/home" replace />} />
+            <Route path="/home" element={<HomePage />} />
             <Route path="/budget" element={<BudgetPage />} />
             <Route path="/accounts" element={<AccountsListPage />} />
             <Route path="/reports" element={<ReportsPage />} />
+            <Route path="/more" element={<MorePage />} />
             <Route path="/categories" element={<CategoriesPage />} />
             <Route path="/settings" element={<SettingsPage />} />
           </Route>
+
+          <Route path="/transactions/new" element={<TransactionFormPage />} />
 
           <Route path="/accounts/new" element={<AccountFormPage />} />
           <Route path="/accounts/:accountId" element={<AccountDetailPage />} />

@@ -7,6 +7,8 @@ export interface Account {
   startingBalanceCents: number
   closed: boolean
   sortOrder: number
+  /** Hex color, e.g. '#7c3aed'. Older accounts may not have one — fall back to the default accent. */
+  color?: string
 }
 
 export interface CategoryGroup {

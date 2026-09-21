@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { PageHeader } from '../../components/PageHeader'
 import { db } from '../../db/db'
 import { formatCents } from '../../lib/money'
+import { ACCOUNT_COLORS } from './accountColors'
 import { ACCOUNT_TYPE_ICONS, ACCOUNT_TYPE_LABELS } from './accountTypes'
 import { computeAccountBalance } from './balance'
 
@@ -23,10 +24,11 @@ export default function AccountsListPage() {
             {accounts.map((account) => {
               const balance = computeAccountBalance(account, transactions ?? [])
               const Icon = ACCOUNT_TYPE_ICONS[account.type]
+              const color = account.color ?? ACCOUNT_COLORS[0]
               return (
                 <li key={account.id}>
                   <Link className="list-item" to={`/accounts/${account.id}`}>
-                    <span className="list-item__icon">
+                    <span className="list-item__icon" style={{ background: `${color}22`, color }}>
                       <Icon size={20} />
                     </span>
                     <span className="list-item__text">

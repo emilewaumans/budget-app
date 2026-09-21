@@ -1,4 +1,5 @@
 import { useLiveQuery } from 'dexie-react-hooks'
+import { Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { PageHeader } from '../../components/PageHeader'
@@ -14,8 +15,15 @@ export default function CategoryFormPage() {
   const [groupId, setGroupId] = useState(groupIdFromRoute ?? '')
   const [goalTarget, setGoalTarget] = useState('')
   const [goalDate, setGoalDate] = useState('')
+  const [confirmingDelete, setConfirmingDelete] = useState(false)
 
   const groups = useLiveQuery(() => db.categoryGroups.orderBy('sortOrder').toArray(), [])
+
+  const affectedTransactionCount = useLiveQuery(async () => {
+    if (!categoryId) return 0
+    const splits = await db.splits.where('categoryId').equals(categoryId).toArray()
+    return new Set(splits.map((s) => s.transactionId)).size
+  }, [categoryId])
 
   useEffect(() => {
     if (!categoryId) return
@@ -69,6 +77,15 @@ export default function CategoryFormPage() {
     }
 
     navigate(-1)
+  }
+
+  async function handleDelete() {
+    if (!categoryId) return
+    await db.splits.where('categoryId').equals(categoryId).delete()
+    await db.categoryMonths.where('categoryId').equals(categoryId).delete()
+    await db.goals.where('categoryId').equals(categoryId).delete()
+    await db.categories.delete(categoryId)
+    navigate('/categories')
   }
 
   return (
@@ -128,6 +145,34 @@ export default function CategoryFormPage() {
         <button type="submit" className="btn btn-primary btn-block">
           Save
         </button>
+
+        {isEditing && !confirmingDelete && (
+          <button
+            type="button"
+            className="btn btn-danger btn-block"
+            onClick={() => setConfirmingDelete(true)}
+          >
+            <Trash2 size={18} /> Delete category
+          </button>
+        )}
+
+        {isEditing && confirmingDelete && (
+          <div className="confirm-box">
+            <p>
+              Delete this category?
+              {affectedTransactionCount ? ` ${affectedTransactionCount} transaction${affectedTransactionCount === 1 ? '' : 's'} will become uncategorized.` : ''}{' '}
+              This can't be undone.
+            </p>
+            <div className="confirm-box__actions">
+              <button type="button" className="btn" onClick={() => setConfirmingDelete(false)}>
+                Cancel
+              </button>
+              <button type="button" className="btn btn-danger" onClick={handleDelete}>
+                Delete permanently
+              </button>
+            </div>
+          </div>
+        )}
       </form>
     </div>
   )

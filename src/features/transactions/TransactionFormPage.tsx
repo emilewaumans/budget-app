@@ -1,7 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { ArrowDownLeft, ArrowUpRight, Plus, SplitSquareHorizontal, Trash2, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { MoneyInput } from '../../components/MoneyInput'
 import { PageHeader } from '../../components/PageHeader'
 import { db } from '../../db/db'
@@ -22,18 +22,42 @@ function newRow(categoryId = '', amount = '0,00'): SplitRow {
 }
 
 export default function TransactionFormPage() {
-  const { accountId, transactionId } = useParams()
+  const { accountId: accountIdFromRoute, transactionId } = useParams()
+  const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const isEditing = Boolean(transactionId)
+  const accountIsFixed = Boolean(accountIdFromRoute)
 
-  const [kind, setKind] = useState<TransactionKind>('expense')
+  const initialKind = searchParams.get('kind') === 'income' ? 'income' : 'expense'
+
+  const [kind, setKind] = useState<TransactionKind>(initialKind)
   const [amount, setAmount] = useState('')
   const [payee, setPayee] = useState('')
   const [date, setDate] = useState(todayISO())
   const [memo, setMemo] = useState('')
   const [rows, setRows] = useState<SplitRow[]>([newRow()])
+  const [selectedAccountId, setSelectedAccountId] = useState('')
 
   const isSplit = rows.length > 1
+
+  const openAccounts = useLiveQuery(
+    () => db.accounts.filter((a) => !a.closed).sortBy('sortOrder'),
+    [],
+  )
+
+  useEffect(() => {
+    if (accountIsFixed || isEditing || selectedAccountId || !openAccounts) return
+    if (openAccounts.length > 0) setSelectedAccountId(openAccounts[0].id)
+  }, [accountIsFixed, isEditing, selectedAccountId, openAccounts])
+
+  useEffect(() => {
+    if (!isEditing) return
+    db.transactions.get(transactionId!).then((transaction) => {
+      if (transaction) setSelectedAccountId(transaction.accountId)
+    })
+  }, [isEditing, transactionId])
+
+  const accountId = accountIdFromRoute ?? selectedAccountId
 
   const payeeSuggestions = useLiveQuery(async () => {
     const all = await db.transactions.orderBy('date').reverse().toArray()
@@ -182,6 +206,27 @@ export default function TransactionFormPage() {
             <ArrowDownLeft size={16} /> Income
           </button>
         </div>
+
+        {!accountIsFixed && (
+          <div className="field">
+            <label htmlFor="account">Account</label>
+            <select
+              id="account"
+              value={selectedAccountId}
+              onChange={(e) => setSelectedAccountId(e.target.value)}
+              required
+            >
+              <option value="" disabled>
+                Choose an account
+              </option>
+              {openAccounts?.map((a) => (
+                <option key={a.id} value={a.id}>
+                  {a.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
 
         <MoneyInput id="amount" label="Amount" value={amount} onChange={setAmount} />
 
