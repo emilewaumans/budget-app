@@ -1,45 +1,25 @@
-import { useLiveQuery } from 'dexie-react-hooks'
-import './App.css'
-import { db } from './db/db'
-import { formatCents } from './lib/money'
-
-function addSampleAccount() {
-  db.accounts.add({
-    id: crypto.randomUUID(),
-    name: 'Checking',
-    type: 'checking',
-    startingBalanceCents: 100000,
-    closed: false,
-    sortOrder: 0,
-  })
-}
-
-function clearAccounts() {
-  db.accounts.clear()
-}
+import { Navigate, Route, HashRouter, Routes } from 'react-router-dom'
+import AccountDetailPage from './features/accounts/AccountDetailPage'
+import AccountFormPage from './features/accounts/AccountFormPage'
+import AccountsListPage from './features/accounts/AccountsListPage'
+import TransactionFormPage from './features/transactions/TransactionFormPage'
 
 function App() {
-  const accounts = useLiveQuery(() => db.accounts.toArray(), [])
-
   return (
-    <div className="app-shell">
-      <h1>Budget</h1>
-      <p>Data layer check (temporary — replaced by the real Accounts screen next)</p>
-
-      <ul className="db-check-list">
-        {accounts?.map((account) => (
-          <li key={account.id}>
-            {account.name} — {formatCents(account.startingBalanceCents)}
-          </li>
-        ))}
-        {accounts?.length === 0 && <li>No accounts yet</li>}
-      </ul>
-
-      <div className="db-check-actions">
-        <button onClick={addSampleAccount}>Add sample account</button>
-        <button onClick={clearAccounts}>Clear</button>
-      </div>
-    </div>
+    <HashRouter>
+      <Routes>
+        <Route path="/" element={<Navigate to="/accounts" replace />} />
+        <Route path="/accounts" element={<AccountsListPage />} />
+        <Route path="/accounts/new" element={<AccountFormPage />} />
+        <Route path="/accounts/:accountId" element={<AccountDetailPage />} />
+        <Route path="/accounts/:accountId/edit" element={<AccountFormPage />} />
+        <Route path="/accounts/:accountId/transactions/new" element={<TransactionFormPage />} />
+        <Route
+          path="/accounts/:accountId/transactions/:transactionId/edit"
+          element={<TransactionFormPage />}
+        />
+      </Routes>
+    </HashRouter>
   )
 }
 

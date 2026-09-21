@@ -15,3 +15,8 @@ export function parseToCents(input: string): number {
   if (Number.isNaN(value)) return 0
   return Math.round(value * 100)
 }
+
+/** Formats integer cents as a plain editable string (e.g. 1234 -> "12,34", -1234 -> "-12,34") for form inputs. */
+export function centsToInputString(cents: number): string {
+  return (cents / 100).toFixed(2).replace('.', ',')
+}
