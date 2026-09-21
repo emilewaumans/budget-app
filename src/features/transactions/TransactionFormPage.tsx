@@ -1,4 +1,5 @@
 import { useLiveQuery } from 'dexie-react-hooks'
+import { ArrowDownLeft, ArrowUpRight, Plus, SplitSquareHorizontal, Trash2, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { MoneyInput } from '../../components/MoneyInput'
@@ -171,14 +172,14 @@ export default function TransactionFormPage() {
             className={kind === 'expense' ? 'active' : undefined}
             onClick={() => setKind('expense')}
           >
-            Expense
+            <ArrowUpRight size={16} /> Expense
           </button>
           <button
             type="button"
             className={kind === 'income' ? 'active' : undefined}
             onClick={() => setKind('income')}
           >
-            Income
+            <ArrowDownLeft size={16} /> Income
           </button>
         </div>
 
@@ -227,7 +228,7 @@ export default function TransactionFormPage() {
               ))}
             </select>
             <button type="button" className="btn" onClick={startSplitting}>
-              Split into multiple categories
+              <SplitSquareHorizontal size={16} /> Split into multiple categories
             </button>
           </div>
         )}
@@ -269,12 +270,12 @@ export default function TransactionFormPage() {
                   onClick={() => removeSplitRow(row.key)}
                   aria-label="Remove split"
                 >
-                  ×
+                  <X size={18} />
                 </button>
               </div>
             ))}
             <button type="button" className="btn" onClick={addSplitRow}>
-              + Add another category
+              <Plus size={16} /> Add another category
             </button>
             <p className={remainingCents !== 0 ? 'amount-negative' : 'list-item__subtitle'}>
               {remainingCents === 0
@@ -299,7 +300,7 @@ export default function TransactionFormPage() {
 
         {isEditing && (
           <button type="button" className="btn btn-danger btn-block" onClick={handleDelete}>
-            Delete transaction
+            <Trash2 size={18} /> Delete transaction
           </button>
         )}
       </form>

@@ -1,3 +1,4 @@
+import { Download, Lock, LockOpen, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { downloadExportZip } from '../export/exportData'
 import { clearPin, hasPinSet, setPin, verifyPin } from '../lock/pin'
@@ -69,7 +70,9 @@ export default function SettingsPage() {
       </header>
       <div className="page-body">
         <section>
-          <h3>App lock</h3>
+          <h3>
+            <Lock size={18} /> App lock
+          </h3>
           <form onSubmit={handleSavePin} className="page-body" style={{ padding: 0 }}>
             {pinIsSet && (
               <div className="field">
@@ -121,19 +124,21 @@ export default function SettingsPage() {
           {pinIsSet && (
             <>
               <button type="button" className="btn btn-danger btn-block" onClick={handleRemovePin}>
-                Remove PIN
+                <Trash2 size={16} /> Remove PIN
               </button>
               <button type="button" className="btn btn-block" onClick={lockNow}>
-                Lock now
+                <LockOpen size={16} /> Lock now
               </button>
             </>
           )}
         </section>
 
         <section>
-          <h3>Data</h3>
+          <h3>
+            <Download size={18} /> Data
+          </h3>
           <button type="button" className="btn btn-block" onClick={handleExport} disabled={exporting}>
-            {exporting ? 'Preparing export…' : 'Export all data (CSV)'}
+            <Download size={16} /> {exporting ? 'Preparing export…' : 'Export all data (CSV)'}
           </button>
           <p className="list-item__subtitle">
             Downloads a .zip with your accounts, categories, transactions, splits, budget history,

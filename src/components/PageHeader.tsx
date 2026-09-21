@@ -1,3 +1,4 @@
+import { ChevronLeft } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
 interface PageHeaderProps {
@@ -17,7 +18,7 @@ export function PageHeader({ title, back = false }: PageHeaderProps) {
           onClick={() => navigate(-1)}
           aria-label="Back"
         >
-          ←
+          <ChevronLeft size={24} />
         </button>
       )}
       <h1>{title}</h1>

@@ -1,4 +1,5 @@
 import { useLiveQuery } from 'dexie-react-hooks'
+import { ArrowDownLeft, ArrowUpRight, Pencil, Plus, Receipt } from 'lucide-react'
 import { Link, useParams } from 'react-router-dom'
 import { PageHeader } from '../../components/PageHeader'
 import { db } from '../../db/db'
@@ -65,30 +66,56 @@ export default function AccountDetailPage() {
         </div>
 
         <Link to={`/accounts/${accountId}/edit`} className="btn">
-          Edit account
+          <Pencil size={16} /> Edit account
         </Link>
 
-        <ul className="list">
-          {transactions?.map((t) => (
-            <li key={t.id}>
-              <Link className="list-item" to={`/accounts/${accountId}/transactions/${t.id}/edit`}>
-                <span>
-                  <div className="list-item__title">{t.payee}</div>
-                  <div className="list-item__subtitle">
-                    {t.date} · {categoryLabelByTransactionId?.get(t.id) ?? (t.amountCents > 0 ? 'Income' : 'Uncategorized')}
-                  </div>
-                </span>
-                <span className={t.amountCents < 0 ? 'amount-negative' : 'amount-positive'}>
-                  {formatCents(t.amountCents)}
-                </span>
-              </Link>
-            </li>
-          ))}
-          {transactions?.length === 0 && <li className="list-empty">No transactions yet</li>}
-        </ul>
+        {transactions && transactions.length > 0 && (
+          <ul className="list">
+            {transactions.map((t) => {
+              const isIncome = t.amountCents > 0
+              return (
+                <li key={t.id}>
+                  <Link
+                    className="list-item"
+                    to={`/accounts/${accountId}/transactions/${t.id}/edit`}
+                  >
+                    <span
+                      className={
+                        isIncome
+                          ? 'list-item__icon list-item__icon--positive'
+                          : 'list-item__icon list-item__icon--negative'
+                      }
+                    >
+                      {isIncome ? <ArrowDownLeft size={18} /> : <ArrowUpRight size={18} />}
+                    </span>
+                    <span className="list-item__text">
+                      <div className="list-item__title">{t.payee}</div>
+                      <div className="list-item__subtitle">
+                        {t.date} ·{' '}
+                        {categoryLabelByTransactionId?.get(t.id) ??
+                          (isIncome ? 'Income' : 'Uncategorized')}
+                      </div>
+                    </span>
+                    <span className={isIncome ? 'amount-positive' : 'amount-negative'}>
+                      {formatCents(t.amountCents)}
+                    </span>
+                  </Link>
+                </li>
+              )
+            })}
+          </ul>
+        )}
+
+        {transactions?.length === 0 && (
+          <div className="empty-state">
+            <Receipt size={40} strokeWidth={1.5} />
+            <h2>No transactions yet</h2>
+            <p>Tap the + button to log your first expense or income for this account.</p>
+          </div>
+        )}
       </div>
       <Link to={`/accounts/${accountId}/transactions/new`} className="fab" aria-label="Add transaction">
-        +
+        <Plus size={26} />
       </Link>
     </div>
   )

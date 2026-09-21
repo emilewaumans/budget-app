@@ -58,6 +58,12 @@ h3 {
   margin: 0;
 }
 
+h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
 h1 {
   font-size: 22px;
 }
@@ -98,10 +104,11 @@ a {
 .page-header__back {
   background: none;
   border: none;
-  font-size: 1.1rem;
   color: var(--accent);
-  padding: 0.25rem 0.5rem 0.25rem 0;
+  padding: 0.25rem 0.25rem 0.25rem 0;
   cursor: pointer;
+  display: flex;
+  align-items: center;
 }
 
 .page-body {
@@ -143,6 +150,33 @@ a {
   border-bottom: none;
 }
 
+.list-item__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  background: var(--accent-bg);
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.list-item__icon--positive {
+  background: rgba(22, 163, 74, 0.12);
+  color: var(--positive);
+}
+
+.list-item__icon--negative {
+  background: rgba(220, 38, 38, 0.12);
+  color: var(--negative);
+}
+
+.list-item__text {
+  flex: 1;
+  min-width: 0;
+}
+
 .list-item__title {
   font-weight: 500;
   color: var(--text-h);
@@ -157,6 +191,49 @@ a {
   padding: 1.5rem 1rem;
   text-align: center;
   color: var(--text-muted);
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.empty-state svg {
+  color: var(--accent);
+  opacity: 0.6;
+  margin-bottom: 0.25rem;
+}
+
+.empty-state h2 {
+  color: var(--text-h);
+}
+
+.empty-state p {
+  max-width: 30ch;
+}
+
+.confirm-box {
+  background: rgba(220, 38, 38, 0.08);
+  border: 1px solid var(--negative);
+  border-radius: 10px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.confirm-box__actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.confirm-box__actions .btn {
+  flex: 1;
 }
 
 /* Amounts */
@@ -212,11 +289,16 @@ textarea:focus {
 
 .segmented button {
   flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
   border: none;
   background: var(--surface);
   padding: 0.6rem;
   cursor: pointer;
   color: var(--text-muted);
+  font: inherit;
 }
 
 .segmented button.active {
@@ -296,11 +378,15 @@ textarea:focus {
 
 .bottom-nav a {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
   text-align: center;
-  padding: 0.75rem 0;
+  padding: 0.6rem 0 0.4rem;
   color: var(--text-muted);
   text-decoration: none;
-  font-size: 0.85rem;
+  font-size: 0.7rem;
   font-weight: 500;
 }
 
@@ -313,12 +399,45 @@ textarea:focus {
 .ready-to-assign {
   background: var(--accent-bg);
   border-radius: 12px;
-  padding: 1rem;
+  padding: 1.25rem 1rem;
   text-align: center;
+}
+
+.ready-to-assign__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--accent);
+  margin-bottom: 0.5rem;
 }
 
 .ready-to-assign.over h2 {
   color: var(--negative);
+}
+
+.ready-to-assign__hint {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 0.4rem;
+}
+
+.category-columns {
+  display: grid;
+  grid-template-columns: 1fr 90px 90px;
+  gap: 0.5rem;
+  padding: 0 0.25rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.category-columns span:not(:first-child) {
+  text-align: right;
 }
 
 .month-nav {
@@ -331,7 +450,8 @@ textarea:focus {
 .month-nav button {
   background: none;
   border: none;
-  font-size: 1.25rem;
+  display: flex;
+  align-items: center;
   color: var(--accent);
   cursor: pointer;
   padding: 0.25rem 0.75rem;

@@ -1,11 +1,12 @@
 import { useLiveQuery } from 'dexie-react-hooks'
+import { ChevronLeft, ChevronRight, PiggyBank, Tags } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { db } from '../../db/db'
 import { currentMonthKey, formatDate, formatMonthKey, shiftMonthKey } from '../../lib/dates'
 import { formatCents } from '../../lib/money'
-import { computeCategorySummaries, computeReadyToAssign } from './calculations'
 import { AssignedInput } from './AssignedInput'
+import { computeCategorySummaries, computeReadyToAssign } from './calculations'
 
 export default function BudgetPage() {
   const [month, setMonth] = useState(currentMonthKey())
@@ -24,6 +25,7 @@ export default function BudgetPage() {
   const transactionsById = new Map(transactions.map((t) => [t.id, t]))
   const summaries = computeCategorySummaries(categories, month, categoryMonths, splits, transactionsById)
   const readyToAssign = computeReadyToAssign(transactions, categoryMonths)
+  const hasCategories = groups.some((g) => categories.some((c) => c.groupId === g.id))
 
   async function setAssigned(categoryId: string, assignedCents: number) {
     const existing = await db.categoryMonths.where({ categoryId, month }).first()
@@ -41,24 +43,45 @@ export default function BudgetPage() {
       </header>
       <div className="page-body">
         <div className={readyToAssign < 0 ? 'ready-to-assign over' : 'ready-to-assign'}>
+          <div className="ready-to-assign__icon">
+            <PiggyBank size={22} />
+          </div>
           <div className="list-item__subtitle">Ready to Assign</div>
           <h2>{formatCents(readyToAssign)}</h2>
+          <p className="ready-to-assign__hint">
+            {readyToAssign < 0
+              ? "You've assigned more than you've received — lower an amount below."
+              : 'Income you have not yet given a job. Assign it to a category below.'}
+          </p>
         </div>
 
         <div className="month-nav">
           <button type="button" onClick={() => setMonth(shiftMonthKey(month, -1))} aria-label="Previous month">
-            ‹
+            <ChevronLeft size={20} />
           </button>
           <strong>{formatMonthKey(month)}</strong>
           <button type="button" onClick={() => setMonth(shiftMonthKey(month, 1))} aria-label="Next month">
-            ›
+            <ChevronRight size={20} />
           </button>
         </div>
 
-        {groups.length === 0 && (
-          <p className="list-empty">
-            No categories yet — <Link to="/categories">add some</Link> to start budgeting.
-          </p>
+        {!hasCategories && (
+          <div className="empty-state">
+            <Tags size={40} strokeWidth={1.5} />
+            <h2>No categories yet</h2>
+            <p>Create categories like "Groceries" or "Rent" to start assigning your money.</p>
+            <Link to="/categories" className="btn btn-primary">
+              Add categories
+            </Link>
+          </div>
+        )}
+
+        {hasCategories && (
+          <div className="category-columns">
+            <span />
+            <span>Assigned</span>
+            <span>Available</span>
+          </div>
         )}
 
         {groups.map((group) => {

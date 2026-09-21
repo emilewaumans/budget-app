@@ -1,11 +1,12 @@
+import { BarChart3, Landmark, Settings, Tags, Wallet } from 'lucide-react'
 import { NavLink, Outlet } from 'react-router-dom'
 
 const TABS = [
-  { to: '/budget', label: 'Budget' },
-  { to: '/accounts', label: 'Accounts' },
-  { to: '/reports', label: 'Reports' },
-  { to: '/categories', label: 'Categories' },
-  { to: '/settings', label: 'Settings' },
+  { to: '/budget', label: 'Budget', Icon: Wallet },
+  { to: '/accounts', label: 'Accounts', Icon: Landmark },
+  { to: '/reports', label: 'Reports', Icon: BarChart3 },
+  { to: '/categories', label: 'Categories', Icon: Tags },
+  { to: '/settings', label: 'Settings', Icon: Settings },
 ]
 
 export function MainLayout() {
@@ -13,9 +14,10 @@ export function MainLayout() {
     <>
       <Outlet />
       <nav className="bottom-nav">
-        {TABS.map((tab) => (
-          <NavLink key={tab.to} to={tab.to} className={({ isActive }) => (isActive ? 'active' : undefined)}>
-            {tab.label}
+        {TABS.map(({ to, label, Icon }) => (
+          <NavLink key={to} to={to} className={({ isActive }) => (isActive ? 'active' : undefined)}>
+            <Icon size={22} strokeWidth={2} />
+            <span>{label}</span>
           </NavLink>
         ))}
       </nav>

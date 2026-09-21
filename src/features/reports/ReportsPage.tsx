@@ -1,4 +1,5 @@
 import { useLiveQuery } from 'dexie-react-hooks'
+import { ChevronLeft, ChevronRight, PieChart } from 'lucide-react'
 import { useState } from 'react'
 import { db } from '../../db/db'
 import { currentMonthKey, formatMonthKey, lastNMonthKeys, shiftMonthKey } from '../../lib/dates'
@@ -30,18 +31,21 @@ export default function ReportsPage() {
       <div className="page-body">
         <div className="month-nav">
           <button type="button" onClick={() => setMonth(shiftMonthKey(month, -1))} aria-label="Previous month">
-            ‹
+            <ChevronLeft size={20} />
           </button>
           <strong>{formatMonthKey(month)}</strong>
           <button type="button" onClick={() => setMonth(shiftMonthKey(month, 1))} aria-label="Next month">
-            ›
+            <ChevronRight size={20} />
           </button>
         </div>
 
         <section>
           <h3>Spending by category</h3>
           {byCategory.length === 0 ? (
-            <p className="list-empty">No categorized spending this month</p>
+            <div className="empty-state">
+              <PieChart size={36} strokeWidth={1.5} />
+              <p>No categorized spending this month</p>
+            </div>
           ) : (
             <div className="bar-list">
               {byCategory.map((row) => (

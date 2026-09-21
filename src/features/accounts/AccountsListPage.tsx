@@ -1,16 +1,11 @@
 import { useLiveQuery } from 'dexie-react-hooks'
+import { Landmark, Plus } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { PageHeader } from '../../components/PageHeader'
 import { db } from '../../db/db'
 import { formatCents } from '../../lib/money'
+import { ACCOUNT_TYPE_ICONS, ACCOUNT_TYPE_LABELS } from './accountTypes'
 import { computeAccountBalance } from './balance'
-
-const ACCOUNT_TYPE_LABELS: Record<string, string> = {
-  checking: 'Checking',
-  savings: 'Savings',
-  cash: 'Cash',
-  credit: 'Credit card',
-}
 
 export default function AccountsListPage() {
   const accounts = useLiveQuery(
@@ -23,30 +18,44 @@ export default function AccountsListPage() {
     <div className="page">
       <PageHeader title="Accounts" />
       <div className="page-body">
-        <ul className="list">
-          {accounts?.map((account) => {
-            const balance = computeAccountBalance(account, transactions ?? [])
-            return (
-              <li key={account.id}>
-                <Link className="list-item" to={`/accounts/${account.id}`}>
-                  <span>
-                    <div className="list-item__title">{account.name}</div>
-                    <div className="list-item__subtitle">
-                      {ACCOUNT_TYPE_LABELS[account.type]}
-                    </div>
-                  </span>
-                  <span className={balance < 0 ? 'amount-negative' : undefined}>
-                    {formatCents(balance)}
-                  </span>
-                </Link>
-              </li>
-            )
-          })}
-          {accounts?.length === 0 && <li className="list-empty">No accounts yet</li>}
-        </ul>
+        {accounts && accounts.length > 0 && (
+          <ul className="list">
+            {accounts.map((account) => {
+              const balance = computeAccountBalance(account, transactions ?? [])
+              const Icon = ACCOUNT_TYPE_ICONS[account.type]
+              return (
+                <li key={account.id}>
+                  <Link className="list-item" to={`/accounts/${account.id}`}>
+                    <span className="list-item__icon">
+                      <Icon size={20} />
+                    </span>
+                    <span className="list-item__text">
+                      <div className="list-item__title">{account.name}</div>
+                      <div className="list-item__subtitle">{ACCOUNT_TYPE_LABELS[account.type]}</div>
+                    </span>
+                    <span className={balance < 0 ? 'amount-negative' : undefined}>
+                      {formatCents(balance)}
+                    </span>
+                  </Link>
+                </li>
+              )
+            })}
+          </ul>
+        )}
+
+        {accounts?.length === 0 && (
+          <div className="empty-state">
+            <Landmark size={40} strokeWidth={1.5} />
+            <h2>No accounts yet</h2>
+            <p>
+              Add a checking, savings, cash, or credit card account to start tracking where your
+              money is.
+            </p>
+          </div>
+        )}
       </div>
       <Link to="/accounts/new" className="fab fab--above-nav" aria-label="Add account">
-        +
+        <Plus size={26} />
       </Link>
     </div>
   )
