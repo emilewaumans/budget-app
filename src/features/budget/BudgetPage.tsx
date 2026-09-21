@@ -2,7 +2,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { db } from '../../db/db'
-import { currentMonthKey, formatMonthKey, shiftMonthKey } from '../../lib/dates'
+import { currentMonthKey, formatDate, formatMonthKey, shiftMonthKey } from '../../lib/dates'
 import { formatCents } from '../../lib/money'
 import { computeCategorySummaries, computeReadyToAssign } from './calculations'
 import { AssignedInput } from './AssignedInput'
@@ -15,8 +15,11 @@ export default function BudgetPage() {
   const categoryMonths = useLiveQuery(() => db.categoryMonths.toArray(), [])
   const splits = useLiveQuery(() => db.splits.toArray(), [])
   const transactions = useLiveQuery(() => db.transactions.toArray(), [])
+  const goals = useLiveQuery(() => db.goals.toArray(), [])
 
-  if (!groups || !categories || !categoryMonths || !splits || !transactions) return null
+  if (!groups || !categories || !categoryMonths || !splits || !transactions || !goals) return null
+
+  const goalByCategoryId = new Map(goals.map((g) => [g.categoryId, g]))
 
   const transactionsById = new Map(transactions.map((t) => [t.id, t]))
   const summaries = computeCategorySummaries(categories, month, categoryMonths, splits, transactionsById)
@@ -71,16 +74,33 @@ export default function BudgetPage() {
                     spentCents: 0,
                     availableCents: 0,
                   }
+                  const goal = goalByCategoryId.get(category.id)
+                  const progressPct = goal
+                    ? Math.min(100, Math.max(0, (summary.availableCents / goal.targetCents) * 100))
+                    : 0
                   return (
-                    <li key={category.id} className="list-item category-row">
-                      <span className="list-item__title">{category.name}</span>
-                      <AssignedInput
-                        value={summary.assignedCents}
-                        onCommit={(cents) => setAssigned(category.id, cents)}
-                      />
-                      <span className={summary.availableCents < 0 ? 'amount-negative' : 'amount-positive'}>
-                        {formatCents(summary.availableCents)}
-                      </span>
+                    <li key={category.id} className="category-item">
+                      <div className="category-row">
+                        <span className="list-item__title">{category.name}</span>
+                        <AssignedInput
+                          value={summary.assignedCents}
+                          onCommit={(cents) => setAssigned(category.id, cents)}
+                        />
+                        <span className={summary.availableCents < 0 ? 'amount-negative' : 'amount-positive'}>
+                          {formatCents(summary.availableCents)}
+                        </span>
+                      </div>
+                      {goal && (
+                        <div className="goal-progress">
+                          <div className="goal-progress__bar">
+                            <div className="goal-progress__fill" style={{ width: `${progressPct}%` }} />
+                          </div>
+                          <div className="goal-progress__label">
+                            {formatCents(summary.availableCents)} of {formatCents(goal.targetCents)} by{' '}
+                            {formatDate(goal.targetDate)}
+                          </div>
+                        </div>
+                      )}
                     </li>
                   )
                 })}

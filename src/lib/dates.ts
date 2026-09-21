@@ -19,3 +19,8 @@ export function shiftMonthKey(month: string, delta: number): string {
 export function formatMonthKey(month: string): string {
   return dayjs(`${month}-01`).format('MMMM YYYY')
 }
+
+/** Formats a 'YYYY-MM-DD' date for display, e.g. "31 Dec 2026". */
+export function formatDate(dateISO: string): string {
+  return dayjs(dateISO).format('D MMM YYYY')
+}
