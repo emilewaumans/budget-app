@@ -7,6 +7,7 @@ import BudgetPage from './features/budget/BudgetPage'
 import CategoriesPage from './features/categories/CategoriesPage'
 import CategoryFormPage from './features/categories/CategoryFormPage'
 import CategoryGroupFormPage from './features/categories/CategoryGroupFormPage'
+import ReportsPage from './features/reports/ReportsPage'
 import RuleFormPage from './features/rules/RuleFormPage'
 import RulesPage from './features/rules/RulesPage'
 import TransactionFormPage from './features/transactions/TransactionFormPage'
@@ -19,6 +20,7 @@ function App() {
           <Route path="/" element={<Navigate to="/budget" replace />} />
           <Route path="/budget" element={<BudgetPage />} />
           <Route path="/accounts" element={<AccountsListPage />} />
+          <Route path="/reports" element={<ReportsPage />} />
           <Route path="/categories" element={<CategoriesPage />} />
         </Route>
 

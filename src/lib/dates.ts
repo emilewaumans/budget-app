@@ -24,3 +24,12 @@ export function formatMonthKey(month: string): string {
 export function formatDate(dateISO: string): string {
   return dayjs(dateISO).format('D MMM YYYY')
 }
+
+/** Returns the n most recent month keys up to and including `month`, oldest first. */
+export function lastNMonthKeys(month: string, n: number): string[] {
+  const result: string[] = []
+  for (let i = n - 1; i >= 0; i--) {
+    result.push(shiftMonthKey(month, -i))
+  }
+  return result
+}
