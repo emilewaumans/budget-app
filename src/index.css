@@ -361,3 +361,26 @@ textarea:focus {
 .list-item--muted {
   color: var(--text-muted);
 }
+
+/* Split transaction rows */
+
+.split-rows {
+  gap: 0.5rem;
+}
+
+.split-row {
+  display: grid;
+  grid-template-columns: 1fr 90px auto;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.split-row__remove {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+}

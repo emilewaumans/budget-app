@@ -7,6 +7,8 @@ import BudgetPage from './features/budget/BudgetPage'
 import CategoriesPage from './features/categories/CategoriesPage'
 import CategoryFormPage from './features/categories/CategoryFormPage'
 import CategoryGroupFormPage from './features/categories/CategoryGroupFormPage'
+import RuleFormPage from './features/rules/RuleFormPage'
+import RulesPage from './features/rules/RulesPage'
 import TransactionFormPage from './features/transactions/TransactionFormPage'
 
 function App() {
@@ -33,6 +35,10 @@ function App() {
         <Route path="/categories/groups/:groupId/edit" element={<CategoryGroupFormPage />} />
         <Route path="/categories/groups/:groupId/categories/new" element={<CategoryFormPage />} />
         <Route path="/categories/:categoryId/edit" element={<CategoryFormPage />} />
+
+        <Route path="/rules" element={<RulesPage />} />
+        <Route path="/rules/new" element={<RuleFormPage />} />
+        <Route path="/rules/:ruleId/edit" element={<RuleFormPage />} />
       </Routes>
     </HashRouter>
   )

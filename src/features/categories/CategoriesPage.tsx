@@ -12,6 +12,10 @@ export default function CategoriesPage() {
         <h1>Categories</h1>
       </header>
       <div className="page-body">
+        <Link to="/rules" className="btn">
+          Manage categorization rules
+        </Link>
+
         {groups?.map((group) => (
           <div key={group.id} className="category-group">
             <Link to={`/categories/groups/${group.id}/edit`} className="category-group__title">

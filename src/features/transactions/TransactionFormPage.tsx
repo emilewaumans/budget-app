@@ -5,9 +5,20 @@ import { MoneyInput } from '../../components/MoneyInput'
 import { PageHeader } from '../../components/PageHeader'
 import { db } from '../../db/db'
 import { todayISO } from '../../lib/dates'
-import { centsToInputString, parseToCents } from '../../lib/money'
+import { centsToInputString, formatCents, parseToCents } from '../../lib/money'
+import { findMatchingRule } from '../rules/matching'
 
 type TransactionKind = 'expense' | 'income'
+
+interface SplitRow {
+  key: string
+  categoryId: string
+  amount: string
+}
+
+function newRow(categoryId = '', amount = '0,00'): SplitRow {
+  return { key: crypto.randomUUID(), categoryId, amount }
+}
 
 export default function TransactionFormPage() {
   const { accountId, transactionId } = useParams()
@@ -19,7 +30,9 @@ export default function TransactionFormPage() {
   const [payee, setPayee] = useState('')
   const [date, setDate] = useState(todayISO())
   const [memo, setMemo] = useState('')
-  const [categoryId, setCategoryId] = useState('')
+  const [rows, setRows] = useState<SplitRow[]>([newRow()])
+
+  const isSplit = rows.length > 1
 
   const payeeSuggestions = useLiveQuery(async () => {
     const all = await db.transactions.orderBy('date').reverse().toArray()
@@ -28,6 +41,7 @@ export default function TransactionFormPage() {
 
   const groups = useLiveQuery(() => db.categoryGroups.orderBy('sortOrder').toArray(), [])
   const categories = useLiveQuery(() => db.categories.orderBy('sortOrder').toArray(), [])
+  const rules = useLiveQuery(() => db.rules.toArray(), [])
 
   useEffect(() => {
     if (!transactionId) return
@@ -39,16 +53,56 @@ export default function TransactionFormPage() {
       setDate(transaction.date)
       setMemo(transaction.memo)
     })
-    db.splits.where('transactionId').equals(transactionId).first().then((split) => {
-      if (split) setCategoryId(split.categoryId)
-    })
+    db.splits
+      .where('transactionId')
+      .equals(transactionId)
+      .toArray()
+      .then((existingSplits) => {
+        if (existingSplits.length === 0) return
+        setRows(
+          existingSplits.map((s) =>
+            newRow(s.categoryId, centsToInputString(Math.abs(s.amountCents))),
+          ),
+        )
+      })
   }, [transactionId])
+
+  function updateRow(key: string, changes: Partial<SplitRow>) {
+    setRows((current) => current.map((r) => (r.key === key ? { ...r, ...changes } : r)))
+  }
+
+  function startSplitting() {
+    setRows((current) => [{ ...current[0], amount }, newRow()])
+  }
+
+  function addSplitRow() {
+    const allocated = rows.reduce((sum, r) => sum + parseToCents(r.amount), 0)
+    const remaining = Math.max(0, parseToCents(amount) - allocated)
+    setRows((current) => [...current, newRow('', centsToInputString(remaining))])
+  }
+
+  function removeSplitRow(key: string) {
+    setRows((current) => (current.length > 1 ? current.filter((r) => r.key !== key) : current))
+  }
+
+  function applyRuleSuggestion(payeeValue: string) {
+    if (kind !== 'expense' || rows.length !== 1 || rows[0].categoryId || !rules) return
+    const match = findMatchingRule(rules, payeeValue)
+    if (match) updateRow(rows[0].key, { categoryId: match.categoryId })
+  }
+
+  const totalCents = Math.abs(parseToCents(amount))
+  const allocatedCents = rows.reduce((sum, r) => sum + parseToCents(r.amount), 0)
+  const remainingCents = totalCents - allocatedCents
+  const splitInvalid = isSplit && remainingCents !== 0
+  const splitMissingCategory = isSplit && rows.some((r) => !r.categoryId)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!accountId) return
+    if (kind === 'expense' && (splitInvalid || splitMissingCategory)) return
 
-    const magnitude = Math.abs(parseToCents(amount))
+    const magnitude = totalCents
     const amountCents = kind === 'expense' ? -magnitude : magnitude
 
     let id = transactionId
@@ -71,25 +125,29 @@ export default function TransactionFormPage() {
         amountCents,
       })
     }
+    if (!id) return
 
-    // Every transaction has at most one split for now (multi-category splits arrive later) —
-    // an expense with a category gets exactly one split row; anything else gets none.
-    if (id) {
-      const existingSplit = await db.splits.where('transactionId').equals(id).first()
-      if (kind === 'expense' && categoryId) {
-        if (existingSplit) {
-          await db.splits.update(existingSplit.id, { categoryId, amountCents })
-        } else {
+    await db.splits.where('transactionId').equals(id).delete()
+
+    if (kind === 'expense') {
+      if (isSplit) {
+        for (const row of rows) {
           await db.splits.add({
             id: crypto.randomUUID(),
             transactionId: id,
-            categoryId,
-            amountCents,
+            categoryId: row.categoryId,
+            amountCents: -Math.abs(parseToCents(row.amount)),
             memo: '',
           })
         }
-      } else if (existingSplit) {
-        await db.splits.delete(existingSplit.id)
+      } else if (rows[0].categoryId) {
+        await db.splits.add({
+          id: crypto.randomUUID(),
+          transactionId: id,
+          categoryId: rows[0].categoryId,
+          amountCents: -magnitude,
+          memo: '',
+        })
       }
     }
 
@@ -132,6 +190,7 @@ export default function TransactionFormPage() {
             id="payee"
             value={payee}
             onChange={(e) => setPayee(e.target.value)}
+            onBlur={(e) => applyRuleSuggestion(e.target.value)}
             list="payee-suggestions"
             placeholder="e.g. Colruyt"
             required
@@ -146,10 +205,14 @@ export default function TransactionFormPage() {
           <input id="date" type="date" value={date} onChange={(e) => setDate(e.target.value)} required />
         </div>
 
-        {kind === 'expense' && (
+        {kind === 'expense' && !isSplit && (
           <div className="field">
             <label htmlFor="category">Category</label>
-            <select id="category" value={categoryId} onChange={(e) => setCategoryId(e.target.value)}>
+            <select
+              id="category"
+              value={rows[0].categoryId}
+              onChange={(e) => updateRow(rows[0].key, { categoryId: e.target.value })}
+            >
               <option value="">— Uncategorized —</option>
               {groups?.map((group) => (
                 <optgroup key={group.id} label={group.name}>
@@ -163,6 +226,61 @@ export default function TransactionFormPage() {
                 </optgroup>
               ))}
             </select>
+            <button type="button" className="btn" onClick={startSplitting}>
+              Split into multiple categories
+            </button>
+          </div>
+        )}
+
+        {kind === 'expense' && isSplit && (
+          <div className="field split-rows">
+            <label>Split across categories</label>
+            {rows.map((row) => (
+              <div key={row.key} className="split-row">
+                <select
+                  value={row.categoryId}
+                  onChange={(e) => updateRow(row.key, { categoryId: e.target.value })}
+                  required
+                >
+                  <option value="" disabled>
+                    Choose a category
+                  </option>
+                  {groups?.map((group) => (
+                    <optgroup key={group.id} label={group.name}>
+                      {categories
+                        ?.filter((c) => c.groupId === group.id)
+                        .map((category) => (
+                          <option key={category.id} value={category.id}>
+                            {category.name}
+                          </option>
+                        ))}
+                    </optgroup>
+                  ))}
+                </select>
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  value={row.amount}
+                  onChange={(e) => updateRow(row.key, { amount: e.target.value })}
+                />
+                <button
+                  type="button"
+                  className="split-row__remove"
+                  onClick={() => removeSplitRow(row.key)}
+                  aria-label="Remove split"
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+            <button type="button" className="btn" onClick={addSplitRow}>
+              + Add another category
+            </button>
+            <p className={remainingCents !== 0 ? 'amount-negative' : 'list-item__subtitle'}>
+              {remainingCents === 0
+                ? 'Fully allocated'
+                : `${formatCents(remainingCents)} left to allocate`}
+            </p>
           </div>
         )}
 
@@ -171,7 +289,11 @@ export default function TransactionFormPage() {
           <input id="memo" value={memo} onChange={(e) => setMemo(e.target.value)} />
         </div>
 
-        <button type="submit" className="btn btn-primary btn-block">
+        <button
+          type="submit"
+          className="btn btn-primary btn-block"
+          disabled={kind === 'expense' && (splitInvalid || splitMissingCategory)}
+        >
           Save
         </button>
 

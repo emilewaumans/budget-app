@@ -17,7 +17,7 @@ export default function AccountDetailPage() {
     return rows.sort((a, b) => b.date.localeCompare(a.date))
   }, [accountId])
 
-  const categoryNameByTransactionId = useLiveQuery(async () => {
+  const categoryLabelByTransactionId = useLiveQuery(async () => {
     if (!transactions || transactions.length === 0) return new Map<string, string>()
     const transactionIds = transactions.map((t) => t.id)
     const [splits, categories] = await Promise.all([
@@ -25,10 +25,20 @@ export default function AccountDetailPage() {
       db.categories.toArray(),
     ])
     const categoryNameById = new Map(categories.map((c) => [c.id, c.name]))
-    const result = new Map<string, string>()
+    const splitsByTransactionId = new Map<string, typeof splits>()
     for (const split of splits) {
-      const name = categoryNameById.get(split.categoryId)
-      if (name) result.set(split.transactionId, name)
+      const list = splitsByTransactionId.get(split.transactionId) ?? []
+      list.push(split)
+      splitsByTransactionId.set(split.transactionId, list)
+    }
+    const result = new Map<string, string>()
+    for (const [transactionId, txSplits] of splitsByTransactionId) {
+      if (txSplits.length > 1) {
+        result.set(transactionId, 'Split')
+      } else {
+        const name = categoryNameById.get(txSplits[0].categoryId)
+        if (name) result.set(transactionId, name)
+      }
     }
     return result
   }, [transactions])
@@ -65,7 +75,7 @@ export default function AccountDetailPage() {
                 <span>
                   <div className="list-item__title">{t.payee}</div>
                   <div className="list-item__subtitle">
-                    {t.date} · {categoryNameByTransactionId?.get(t.id) ?? (t.amountCents > 0 ? 'Income' : 'Uncategorized')}
+                    {t.date} · {categoryLabelByTransactionId?.get(t.id) ?? (t.amountCents > 0 ? 'Income' : 'Uncategorized')}
                   </div>
                 </span>
                 <span className={t.amountCents < 0 ? 'amount-negative' : 'amount-positive'}>
