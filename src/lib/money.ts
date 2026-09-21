@@ -20,3 +20,8 @@ export function parseToCents(input: string): number {
 export function centsToInputString(cents: number): string {
   return (cents / 100).toFixed(2).replace('.', ',')
 }
+
+/** Formats integer cents with a period decimal (e.g. 1234 -> "12.34") for CSV export — locale-independent. */
+export function centsToDecimalString(cents: number): string {
+  return (cents / 100).toFixed(2)
+}

@@ -10,6 +10,7 @@ import CategoryGroupFormPage from './features/categories/CategoryGroupFormPage'
 import ReportsPage from './features/reports/ReportsPage'
 import RuleFormPage from './features/rules/RuleFormPage'
 import RulesPage from './features/rules/RulesPage'
+import SettingsPage from './features/settings/SettingsPage'
 import TransactionFormPage from './features/transactions/TransactionFormPage'
 
 function App() {
@@ -22,6 +23,7 @@ function App() {
           <Route path="/accounts" element={<AccountsListPage />} />
           <Route path="/reports" element={<ReportsPage />} />
           <Route path="/categories" element={<CategoriesPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
         </Route>
 
         <Route path="/accounts/new" element={<AccountFormPage />} />

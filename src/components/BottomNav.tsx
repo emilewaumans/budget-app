@@ -5,6 +5,7 @@ const TABS = [
   { to: '/accounts', label: 'Accounts' },
   { to: '/reports', label: 'Reports' },
   { to: '/categories', label: 'Categories' },
+  { to: '/settings', label: 'Settings' },
 ]
 
 export function MainLayout() {
