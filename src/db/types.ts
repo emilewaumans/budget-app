@@ -71,3 +71,19 @@ export interface Goal {
   targetDate: string
   note: string
 }
+
+export type TransactionKind = 'expense' | 'income'
+
+/** A saved template (e.g. "Salary", "Netflix") that pre-fills a new transaction in one tap. */
+export interface RecurringTemplate {
+  id: string
+  name: string
+  kind: TransactionKind
+  payee: string
+  amountCents: number
+  accountId: string
+  /** Empty string means uncategorized; unused for income. */
+  categoryId: string
+  memo: string
+  sortOrder: number
+}

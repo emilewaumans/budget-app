@@ -1,4 +1,4 @@
-import { HelpCircle, Settings, Tags } from 'lucide-react'
+import { HelpCircle, Repeat, Settings, Tags } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 export default function MorePage() {
@@ -17,6 +17,17 @@ export default function MorePage() {
               <span className="list-item__text">
                 <div className="list-item__title">How this app works</div>
                 <div className="list-item__subtitle">A simple guide to every feature</div>
+              </span>
+            </Link>
+          </li>
+          <li>
+            <Link className="list-item" to="/recurring">
+              <span className="list-item__icon">
+                <Repeat size={20} />
+              </span>
+              <span className="list-item__text">
+                <div className="list-item__title">Recurring</div>
+                <div className="list-item__subtitle">Salary, subscriptions, and other repeats</div>
               </span>
             </Link>
           </li>

@@ -6,6 +6,7 @@ import type {
   CategoryMonth,
   CategorizationRule,
   Goal,
+  RecurringTemplate,
   Split,
   Transaction,
 } from './types'
@@ -19,6 +20,7 @@ class BudgetDB extends Dexie {
   splits!: EntityTable<Split, 'id'>
   rules!: EntityTable<CategorizationRule, 'id'>
   goals!: EntityTable<Goal, 'id'>
+  recurringTemplates!: EntityTable<RecurringTemplate, 'id'>
 
   constructor() {
     super('budgetdb')
@@ -32,6 +34,18 @@ class BudgetDB extends Dexie {
       splits: 'id, transactionId, categoryId',
       rules: 'id, matchText, categoryId, priority',
       goals: 'id, categoryId',
+    })
+
+    this.version(2).stores({
+      accounts: 'id, name, type, closed, sortOrder',
+      categoryGroups: 'id, name, sortOrder',
+      categories: 'id, groupId, name, sortOrder',
+      categoryMonths: 'id, [categoryId+month], month',
+      transactions: 'id, accountId, date, payee, cleared',
+      splits: 'id, transactionId, categoryId',
+      rules: 'id, matchText, categoryId, priority',
+      goals: 'id, categoryId',
+      recurringTemplates: 'id, sortOrder',
     })
   }
 }

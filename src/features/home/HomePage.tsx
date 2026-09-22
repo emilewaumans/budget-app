@@ -1,20 +1,28 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { ArrowDownLeft, ArrowUpRight, HelpCircle, Receipt, Wallet } from 'lucide-react'
-import { useMemo } from 'react'
-import { Link } from 'react-router-dom'
+import { useMemo, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { db } from '../../db/db'
 import { formatCents } from '../../lib/money'
 import { computeAccountBalance } from '../accounts/balance'
+import { createTransactionFromTemplate } from '../recurring/useFromTemplate'
 import { useCategoryLabels } from '../transactions/useCategoryLabels'
 
 const RECENT_LIMIT = 8
 
 export default function HomePage() {
+  const navigate = useNavigate()
+  const [usingId, setUsingId] = useState<string | null>(null)
+
   const accounts = useLiveQuery(
     () => db.accounts.filter((a) => !a.closed).sortBy('sortOrder'),
     [],
   )
   const transactions = useLiveQuery(() => db.transactions.toArray(), [])
+  const recurringTemplates = useLiveQuery(
+    () => db.recurringTemplates.orderBy('sortOrder').toArray(),
+    [],
+  )
 
   // Memoized so this array's identity only changes when `transactions` itself changes —
   // otherwise useCategoryLabels' internal useLiveQuery would see a "new" input every render
@@ -35,6 +43,18 @@ export default function HomePage() {
     (sum, account) => sum + computeAccountBalance(account, transactions ?? []),
     0,
   )
+
+  async function handleUseTemplate(templateId: string) {
+    const template = await db.recurringTemplates.get(templateId)
+    if (!template) return
+    setUsingId(templateId)
+    try {
+      const transactionId = await createTransactionFromTemplate(template)
+      navigate(`/accounts/${template.accountId}/transactions/${transactionId}/edit`)
+    } finally {
+      setUsingId(null)
+    }
+  }
 
   return (
     <div className="page">
@@ -71,6 +91,30 @@ export default function HomePage() {
             <Link to="/accounts/new" className="btn btn-primary">
               Add an account
             </Link>
+          </div>
+        )}
+
+        {recurringTemplates && recurringTemplates.length > 0 && (
+          <div className="category-group">
+            <h3>Recurring</h3>
+            <div className="recurring-chips">
+              {recurringTemplates.map((t) => (
+                <button
+                  key={t.id}
+                  type="button"
+                  className={
+                    t.kind === 'income'
+                      ? 'recurring-chip recurring-chip--income'
+                      : 'recurring-chip recurring-chip--expense'
+                  }
+                  onClick={() => handleUseTemplate(t.id)}
+                  disabled={usingId === t.id}
+                >
+                  {t.kind === 'income' ? <ArrowDownLeft size={16} /> : <ArrowUpRight size={16} />}
+                  {t.name}
+                </button>
+              ))}
+            </div>
           </div>
         )}
 
