@@ -1,4 +1,5 @@
 import { useLiveQuery } from 'dexie-react-hooks'
+import { Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { PageHeader } from '../../components/PageHeader'
@@ -9,11 +10,18 @@ export default function CategoryGroupFormPage() {
   const navigate = useNavigate()
   const isEditing = Boolean(groupId)
   const [name, setName] = useState('')
+  const [confirmingDelete, setConfirmingDelete] = useState(false)
 
-  const categoryCount = useLiveQuery(
-    () => (groupId ? db.categories.where('groupId').equals(groupId).count() : 0),
+  const categoryIds = useLiveQuery(
+    () => (groupId ? db.categories.where('groupId').equals(groupId).primaryKeys() : []),
     [groupId],
   )
+
+  const affectedTransactionCount = useLiveQuery(async () => {
+    if (!categoryIds || categoryIds.length === 0) return 0
+    const splits = await db.splits.where('categoryId').anyOf(categoryIds).toArray()
+    return new Set(splits.map((s) => s.transactionId)).size
+  }, [categoryIds])
 
   useEffect(() => {
     if (!groupId) return
@@ -36,9 +44,13 @@ export default function CategoryGroupFormPage() {
   }
 
   async function handleDelete() {
-    if (!groupId) return
+    if (!groupId || !categoryIds) return
+    await db.splits.where('categoryId').anyOf(categoryIds).delete()
+    await db.categoryMonths.where('categoryId').anyOf(categoryIds).delete()
+    await db.goals.where('categoryId').anyOf(categoryIds).delete()
+    await db.categories.where('groupId').equals(groupId).delete()
     await db.categoryGroups.delete(groupId)
-    navigate(-1)
+    navigate('/categories')
   }
 
   return (
@@ -60,14 +72,36 @@ export default function CategoryGroupFormPage() {
           Save
         </button>
 
-        {isEditing &&
-          (categoryCount === 0 ? (
-            <button type="button" className="btn btn-danger btn-block" onClick={handleDelete}>
-              Delete group
-            </button>
-          ) : (
-            <p className="list-empty">Move or delete its categories first to remove this group.</p>
-          ))}
+        {isEditing && !confirmingDelete && (
+          <button
+            type="button"
+            className="btn btn-danger btn-block"
+            onClick={() => setConfirmingDelete(true)}
+          >
+            <Trash2 size={18} /> Delete group
+          </button>
+        )}
+
+        {isEditing && confirmingDelete && (
+          <div className="confirm-box">
+            <p>
+              Delete this group and its {categoryIds?.length ?? 0} categor
+              {categoryIds?.length === 1 ? 'y' : 'ies'}?
+              {affectedTransactionCount
+                ? ` ${affectedTransactionCount} transaction${affectedTransactionCount === 1 ? '' : 's'} will become uncategorized.`
+                : ''}{' '}
+              This can't be undone.
+            </p>
+            <div className="confirm-box__actions">
+              <button type="button" className="btn" onClick={() => setConfirmingDelete(false)}>
+                Cancel
+              </button>
+              <button type="button" className="btn btn-danger" onClick={handleDelete}>
+                Delete permanently
+              </button>
+            </div>
+          </div>
+        )}
       </form>
     </div>
   )

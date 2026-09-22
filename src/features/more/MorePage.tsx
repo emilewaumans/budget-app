@@ -1,4 +1,4 @@
-import { Settings, Tags } from 'lucide-react'
+import { HelpCircle, Settings, Tags } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 export default function MorePage() {
@@ -9,6 +9,17 @@ export default function MorePage() {
       </header>
       <div className="page-body">
         <ul className="list">
+          <li>
+            <Link className="list-item" to="/help">
+              <span className="list-item__icon">
+                <HelpCircle size={20} />
+              </span>
+              <span className="list-item__text">
+                <div className="list-item__title">How this app works</div>
+                <div className="list-item__subtitle">A simple guide to every feature</div>
+              </span>
+            </Link>
+          </li>
           <li>
             <Link className="list-item" to="/categories">
               <span className="list-item__icon">

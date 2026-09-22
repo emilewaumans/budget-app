@@ -1,5 +1,5 @@
 import { useLiveQuery } from 'dexie-react-hooks'
-import { ArrowDownLeft, ArrowUpRight, Receipt, Wallet } from 'lucide-react'
+import { ArrowDownLeft, ArrowUpRight, HelpCircle, Receipt, Wallet } from 'lucide-react'
 import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { db } from '../../db/db'
@@ -40,6 +40,9 @@ export default function HomePage() {
     <div className="page">
       <header className="page-header">
         <h1>Home</h1>
+        <Link to="/help" className="page-header__help" aria-label="How this app works">
+          <HelpCircle size={22} />
+        </Link>
       </header>
       <div className="page-body">
         <div className="home-balance">

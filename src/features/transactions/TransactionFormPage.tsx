@@ -28,9 +28,9 @@ export default function TransactionFormPage() {
   const isEditing = Boolean(transactionId)
   const accountIsFixed = Boolean(accountIdFromRoute)
 
-  const initialKind = searchParams.get('kind') === 'income' ? 'income' : 'expense'
-
-  const [kind, setKind] = useState<TransactionKind>(initialKind)
+  const [kind, setKind] = useState<TransactionKind>(
+    searchParams.get('kind') === 'income' ? 'income' : 'expense',
+  )
   const [amount, setAmount] = useState('')
   const [payee, setPayee] = useState('')
   const [date, setDate] = useState(todayISO())
@@ -49,6 +49,12 @@ export default function TransactionFormPage() {
     if (accountIsFixed || isEditing || selectedAccountId || !openAccounts) return
     if (openAccounts.length > 0) setSelectedAccountId(openAccounts[0].id)
   }, [accountIsFixed, isEditing, selectedAccountId, openAccounts])
+
+  useEffect(() => {
+    if (isEditing) return
+    const paramKind = searchParams.get('kind')
+    if (paramKind === 'income' || paramKind === 'expense') setKind(paramKind)
+  }, [isEditing, searchParams])
 
   useEffect(() => {
     if (!isEditing) return
@@ -193,14 +199,14 @@ export default function TransactionFormPage() {
         <div className="segmented">
           <button
             type="button"
-            className={kind === 'expense' ? 'active' : undefined}
+            className={kind === 'expense' ? 'active expense' : undefined}
             onClick={() => setKind('expense')}
           >
             <ArrowUpRight size={16} /> Expense
           </button>
           <button
             type="button"
-            className={kind === 'income' ? 'active' : undefined}
+            className={kind === 'income' ? 'active income' : undefined}
             onClick={() => setKind('income')}
           >
             <ArrowDownLeft size={16} /> Income

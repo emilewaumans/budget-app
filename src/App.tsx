@@ -7,6 +7,7 @@ import BudgetPage from './features/budget/BudgetPage'
 import CategoriesPage from './features/categories/CategoriesPage'
 import CategoryFormPage from './features/categories/CategoryFormPage'
 import CategoryGroupFormPage from './features/categories/CategoryGroupFormPage'
+import HelpPage from './features/help/HelpPage'
 import HomePage from './features/home/HomePage'
 import { AppLock } from './features/lock/LockContext'
 import MorePage from './features/more/MorePage'
@@ -51,6 +52,8 @@ function App() {
           <Route path="/rules" element={<RulesPage />} />
           <Route path="/rules/new" element={<RuleFormPage />} />
           <Route path="/rules/:ruleId/edit" element={<RuleFormPage />} />
+
+          <Route path="/help" element={<HelpPage />} />
         </Routes>
       </HashRouter>
     </AppLock>
