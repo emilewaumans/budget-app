@@ -42,6 +42,7 @@ html,
 body {
   height: 100%;
   margin: 0;
+  overflow-x: hidden;
   overscroll-behavior: none;
 }
 
@@ -92,7 +93,9 @@ a {
   min-height: 0; /* lets this flex child scroll internally instead of stretching the whole shell */
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
   overflow-y: auto;
+  overscroll-behavior: contain; /* stops iOS's rubber-band bounce from dragging the whole shell around */
   -webkit-overflow-scrolling: touch;
   padding-bottom: 5rem; /* keeps content clear of any floating action button */
 }
