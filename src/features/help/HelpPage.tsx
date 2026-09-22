@@ -1,134 +1,157 @@
 import {
-  ArrowDownLeft,
   ArrowUpRight,
   BarChart3,
-  Download,
   Landmark,
   Lock,
+  MoreHorizontal,
   PiggyBank,
-  Tags,
+  Repeat,
 } from 'lucide-react'
+import type { ReactNode } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { PageHeader } from '../../components/PageHeader'
 
+interface Topic {
+  id: string
+  title: string
+  Icon: typeof ArrowUpRight
+  content: ReactNode
+}
+
+const TOPICS: Topic[] = [
+  {
+    id: 'transactions',
+    title: 'Adding money in and out',
+    Icon: ArrowUpRight,
+    content: (
+      <>
+        <p>
+          On the <strong>Home</strong> screen, tap the big red <strong>Add Expense</strong> button
+          when you spend money, or the big green <strong>Add Income</strong> button when you
+          receive it. Type in the amount and who you paid or who paid you, then tap{' '}
+          <strong>Save</strong>. That's it — today's date is already filled in for you.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: 'accounts',
+    title: 'Accounts',
+    Icon: Landmark,
+    content: (
+      <p>
+        An "account" is simply a place where your money is — your bank account, a savings
+        account, or cash in your wallet. You can add more than one under{' '}
+        <strong>More → Accounts</strong>, and each shows its own balance (how much money is in it
+        right now).
+      </p>
+    ),
+  },
+  {
+    id: 'goals',
+    title: 'Savings Goals',
+    Icon: PiggyBank,
+    content: (
+      <>
+        <p>
+          A savings goal is something you're looking forward to, like a new watch or a vacation —
+          not a bill. Give it a name and a target amount, then log deposits whenever you set money
+          aside for it.
+        </p>
+        <p>
+          Every goal keeps a full log book: you can see exactly when you saved how much, edit or
+          delete any entry, or log a withdrawal if you need to take some of that money back out.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: 'reports',
+    title: 'Reports',
+    Icon: BarChart3,
+    content: (
+      <p>
+        Under <strong>More → Reports</strong> you'll find a simple bar chart showing how much you
+        spent each month, so you can see how your spending compares over time.
+      </p>
+    ),
+  },
+  {
+    id: 'recurring',
+    title: 'Recurring',
+    Icon: Repeat,
+    content: (
+      <p>
+        If you log the same thing often, like your salary or a subscription, save it once under{' '}
+        <strong>More → Recurring</strong>. After that it shows up as a one-tap button on the Home
+        screen — tap it and today's entry is created instantly, ready for you to double check
+        before you move on.
+      </p>
+    ),
+  },
+  {
+    id: 'more',
+    title: 'The More menu',
+    Icon: MoreHorizontal,
+    content: (
+      <p>
+        Everything that isn't Home or Savings Goals lives here. Tap the gear icon in the top-right
+        corner to change the color of any button — tap a color swatch to pick it, then tap the
+        checkmark when you're done.
+      </p>
+    ),
+  },
+  {
+    id: 'settings',
+    title: 'Settings',
+    Icon: Lock,
+    content: (
+      <>
+        <p>
+          You can set a PIN code, like on a bank card, so no one else can open the app — tap{' '}
+          <strong>Change PIN</strong> to set, change, or remove it.
+        </p>
+        <p>
+          You can also download a copy of everything in the app as a .zip of CSV files (for
+          example, to open in Excel) — you're never stuck with only this app.
+        </p>
+      </>
+    ),
+  },
+]
+
+const INTRO =
+  "This app is a notebook for your money. It helps you keep track of what you spend and what you receive, so you always know where your money is."
+
+const TROUBLESHOOTING = 'Close the app completely and open it again from its icon on your home screen. That fixes almost everything.'
+
 export default function HelpPage() {
+  const [searchParams] = useSearchParams()
+  const topicId = searchParams.get('topic')
+  const topics = topicId ? TOPICS.filter((t) => t.id === topicId) : TOPICS
+  const title = topicId ? (topics[0]?.title ?? 'How this app works') : 'How this app works'
+
   return (
     <div className="page">
-      <PageHeader title="How this app works" back />
+      <PageHeader title={title} back />
       <div className="page-body help-content">
-        <p>
-          This app is a notebook for your money. It helps you keep track of what you spend and
-          what you receive, so you always know where your money is.
-        </p>
+        {!topicId && <p>{INTRO}</p>}
 
-        <section>
-          <h3>
-            <ArrowUpRight size={20} /> Adding something you spent
-          </h3>
-          <p>
-            On the <strong>Home</strong> screen, tap the big red <strong>Add Expense</strong>{' '}
-            button. Type in how much you spent and who you paid (for example "Supermarket"), then
-            tap <strong>Save</strong>. That's it — today's date is already filled in for you.
-          </p>
-        </section>
+        {topics.map((topic) => (
+          <section key={topic.id}>
+            <h3>
+              <topic.Icon size={20} /> {topic.title}
+            </h3>
+            {topic.content}
+          </section>
+        ))}
 
-        <section>
-          <h3>
-            <ArrowDownLeft size={20} /> Adding money you received
-          </h3>
-          <p>
-            Tap the big green <strong>Add Income</strong> button, for example when your salary
-            arrives. Fill in the amount and where it came from, then tap <strong>Save</strong>.
-          </p>
-        </section>
-
-        <section>
-          <h3>
-            <Landmark size={20} /> Accounts
-          </h3>
-          <p>
-            An "account" is simply a place where your money is — your bank account, a savings
-            account, or cash in your wallet. You can add more than one, and each shows its own
-            balance (how much money is in it right now). Find your accounts under{' '}
-            <strong>More → Accounts</strong>.
-          </p>
-        </section>
-
-        <section>
-          <h3>
-            <Tags size={20} /> Categories
-          </h3>
-          <p>
-            A "category" is a label for what you spent money on, like "Groceries" or
-            "Electricity". It helps you see where your money goes. You don't have to pick one
-            every time — if you're in a hurry, leaving it as "Uncategorized" is perfectly fine.
-            Manage them under <strong>More → Categories</strong>.
-          </p>
-        </section>
-
-        <section>
-          <h3>The Budget screen (like envelopes of cash), under More → Budget</h3>
-          <p>
-            Imagine putting cash into separate envelopes each month — one for groceries, one for
-            electricity, and so on. The Budget screen works the same way, just on your phone.
-          </p>
-          <p>
-            <strong>"Ready to Assign"</strong> is money you've received but haven't put into an
-            envelope yet. Once you put money into a category, it stays there — even when the
-            month changes — until you actually spend it. It never just disappears.
-          </p>
-        </section>
-
-        <section>
-          <h3>
-            <PiggyBank size={20} /> Savings Goals
-          </h3>
-          <p>
-            This is a different, happier kind of envelope — for something you're looking forward
-            to, like a new watch or a vacation, not a bill. It works the same way as a budget
-            category (you set money aside for it a little at a time, and it never resets), but it
-            has its own tab at the bottom of the screen so it never gets mixed in with your
-            everyday spending.
-          </p>
-        </section>
-
-        <section>
-          <h3>
-            <BarChart3 size={20} /> Reports
-          </h3>
-          <p>
-            Under <strong>More → Reports</strong> you'll find simple bar charts: how much you
-            spent in each category, and how your spending compares month to month.
-          </p>
-        </section>
-
-        <section>
-          <h3>
-            <Lock size={20} /> Locking the app
-          </h3>
-          <p>
-            You can set a PIN code, like on a bank card, so no one else can open the app. Go to{' '}
-            <strong>More → Settings → App lock</strong> to set, change, or remove it.
-          </p>
-        </section>
-
-        <section>
-          <h3>
-            <Download size={20} /> Getting a copy of your information
-          </h3>
-          <p>
-            If you'd like a copy of everything in the app (for example, to open in Excel), go to{' '}
-            <strong>More → Settings → Export all data</strong>. It saves a file with everything in
-            it — you're never stuck with only this app.
-          </p>
-        </section>
-
-        <section>
-          <h3>Something not working?</h3>
-          <p>
-            Close the app completely and open it again from its icon on your home screen. That
-            fixes almost everything.
-          </p>
-        </section>
+        {!topicId && (
+          <section>
+            <h3>Something not working?</h3>
+            <p>{TROUBLESHOOTING}</p>
+          </section>
+        )}
       </div>
     </div>
   )

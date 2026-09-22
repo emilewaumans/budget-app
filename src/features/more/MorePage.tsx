@@ -1,13 +1,4 @@
-import {
-  BarChart3,
-  Check,
-  HelpCircle,
-  Landmark,
-  Repeat,
-  Settings,
-  Tags,
-  Wallet,
-} from 'lucide-react'
+import { BarChart3, Check, HelpCircle, Landmark, Repeat, Settings } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ColorSwatchPicker } from '../../components/ColorSwatchPicker'
@@ -15,10 +6,8 @@ import { nextPaletteColor, PALETTE_COLORS } from '../../lib/palette'
 import { getMoreItemColors, setMoreItemColors } from './moreColors'
 
 const MORE_ITEMS = [
-  { id: 'budget', label: 'Budget', to: '/budget', Icon: Wallet },
   { id: 'accounts', label: 'Accounts', to: '/accounts', Icon: Landmark },
   { id: 'reports', label: 'Reports', to: '/reports', Icon: BarChart3 },
-  { id: 'categories', label: 'Categories', to: '/categories', Icon: Tags },
   { id: 'recurring', label: 'Recurring', to: '/recurring', Icon: Repeat },
   { id: 'help', label: 'How this app works', to: '/help', Icon: HelpCircle },
   { id: 'settings', label: 'Settings', to: '/settings', Icon: Settings },
@@ -42,14 +31,18 @@ export default function MorePage() {
     <div className="page">
       <header className="page-header">
         <h1>More</h1>
-        <button
-          type="button"
-          className="page-header__help"
-          onClick={() => setEditMode((v) => !v)}
-          aria-label={editMode ? 'Done customizing colors' : 'Customize colors'}
-        >
-          {editMode ? <Check size={22} /> : <Settings size={22} />}
-        </button>
+        <div className="page-header__actions">
+          <Link to="/help?topic=more" aria-label="How this page works">
+            <HelpCircle size={22} />
+          </Link>
+          <button
+            type="button"
+            onClick={() => setEditMode((v) => !v)}
+            aria-label={editMode ? 'Done customizing colors' : 'Customize colors'}
+          >
+            {editMode ? <Check size={22} /> : <Settings size={22} />}
+          </button>
+        </div>
       </header>
       <div className="page-body">
         {editMode && (

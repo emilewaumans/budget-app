@@ -1,36 +1,17 @@
-import type { SavingsGoal, SavingsGoalMonth } from '../../db/types'
+import type { SavingsGoalContribution } from '../../db/types'
 
-export interface GoalSummary {
-  /** Money put toward this goal for the viewed month only. */
-  assignedCents: number
-  /** Total saved so far, carried forward from every prior month plus this one. */
-  savedCents: number
+/** Total saved so far for one goal — just the running sum of its contribution log. */
+export function computeSavedCents(goalId: string, contributions: SavingsGoalContribution[]): number {
+  return contributions
+    .filter((c) => c.goalId === goalId)
+    .reduce((sum, c) => sum + c.amountCents, 0)
 }
 
-/** Mirrors computeCategorySummaries, but goals never have a "spent" side — nothing is ever withdrawn in-app. */
-export function computeGoalSummaries(
-  goals: SavingsGoal[],
-  month: string,
-  goalMonths: SavingsGoalMonth[],
-): Map<string, GoalSummary> {
-  const assignedThisMonth = new Map<string, number>()
-  const cumulativeAssigned = new Map<string, number>()
-
-  for (const gm of goalMonths) {
-    if (gm.month === month) {
-      assignedThisMonth.set(gm.goalId, (assignedThisMonth.get(gm.goalId) ?? 0) + gm.assignedCents)
-    }
-    if (gm.month <= month) {
-      cumulativeAssigned.set(gm.goalId, (cumulativeAssigned.get(gm.goalId) ?? 0) + gm.assignedCents)
-    }
+/** Same total, for every goal at once — one pass instead of filtering per goal. */
+export function computeSavedByGoal(contributions: SavingsGoalContribution[]): Map<string, number> {
+  const saved = new Map<string, number>()
+  for (const c of contributions) {
+    saved.set(c.goalId, (saved.get(c.goalId) ?? 0) + c.amountCents)
   }
-
-  const summaries = new Map<string, GoalSummary>()
-  for (const goal of goals) {
-    summaries.set(goal.id, {
-      assignedCents: assignedThisMonth.get(goal.id) ?? 0,
-      savedCents: cumulativeAssigned.get(goal.id) ?? 0,
-    })
-  }
-  return summaries
+  return saved
 }

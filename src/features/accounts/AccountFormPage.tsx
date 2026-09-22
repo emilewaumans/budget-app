@@ -77,11 +77,6 @@ export default function AccountFormPage() {
 
   async function handleDelete() {
     if (!accountId) return
-    const transactionIds = await db.transactions
-      .where('accountId')
-      .equals(accountId)
-      .primaryKeys()
-    await db.splits.where('transactionId').anyOf(transactionIds).delete()
     await db.transactions.where('accountId').equals(accountId).delete()
     await db.accounts.delete(accountId)
     navigate('/accounts')

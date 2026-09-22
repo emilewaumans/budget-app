@@ -11,28 +11,6 @@ export interface Account {
   color?: string
 }
 
-export interface CategoryGroup {
-  id: string
-  name: string
-  sortOrder: number
-}
-
-export interface Category {
-  id: string
-  groupId: string
-  name: string
-  sortOrder: number
-}
-
-/** One row per category per month — the only place a "budgeted amount" is stored. */
-export interface CategoryMonth {
-  id: string
-  categoryId: string
-  /** Format: 'YYYY-MM' */
-  month: string
-  assignedCents: number
-}
-
 export interface Transaction {
   id: string
   accountId: string
@@ -44,29 +22,10 @@ export interface Transaction {
   amountCents: number
 }
 
-/** Every transaction has at least one split — single- and multi-category transactions share this one code path. */
-export interface Split {
-  id: string
-  transactionId: string
-  categoryId: string
-  amountCents: number
-  memo: string
-}
-
-export type RuleMatchType = 'contains' | 'exact'
-
-export interface CategorizationRule {
-  id: string
-  matchText: string
-  matchType: RuleMatchType
-  categoryId: string
-  priority: number
-}
-
 /**
- * A savings goal (e.g. "New watch", "Vacation") — deliberately its own concept, not a
- * spending category. It works like an envelope (assign money to it, it rolls over) but is
- * never mixed into the spending-category list, and nothing is ever "spent" from it in-app.
+ * A savings goal (e.g. "New watch", "Vacation") — its own concept, separate from spending.
+ * Its progress comes entirely from its own contribution log (see SavingsGoalContribution),
+ * not from anything assigned/spent elsewhere in the app.
  */
 export interface SavingsGoal {
   id: string
@@ -78,13 +37,17 @@ export interface SavingsGoal {
   sortOrder: number
 }
 
-/** One row per goal per month — mirrors CategoryMonth so goals share the same assign/rollover mechanic. */
-export interface SavingsGoalMonth {
+/**
+ * One logged deposit or withdrawal toward a goal — the "log book" entry. Positive amountCents
+ * is money set aside; negative is money taken back out. Saved-so-far is just the running sum.
+ */
+export interface SavingsGoalContribution {
   id: string
   goalId: string
-  /** Format: 'YYYY-MM' */
-  month: string
-  assignedCents: number
+  /** Format: 'YYYY-MM-DD' */
+  date: string
+  amountCents: number
+  note: string
 }
 
 export type TransactionKind = 'expense' | 'income'
@@ -97,8 +60,6 @@ export interface RecurringTemplate {
   payee: string
   amountCents: number
   accountId: string
-  /** Empty string means uncategorized; unused for income. */
-  categoryId: string
   memo: string
   sortOrder: number
 }

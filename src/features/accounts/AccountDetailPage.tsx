@@ -4,7 +4,6 @@ import { Link, useParams } from 'react-router-dom'
 import { PageHeader } from '../../components/PageHeader'
 import { db } from '../../db/db'
 import { formatCents } from '../../lib/money'
-import { useCategoryLabels } from '../transactions/useCategoryLabels'
 import { ACCOUNT_COLORS } from './accountColors'
 import { ACCOUNT_TYPE_ICONS } from './accountTypes'
 import { computeAccountBalance } from './balance'
@@ -20,8 +19,6 @@ export default function AccountDetailPage() {
     const rows = await db.transactions.where('accountId').equals(accountId).toArray()
     return rows.sort((a, b) => b.date.localeCompare(a.date))
   }, [accountId])
-
-  const categoryLabelByTransactionId = useCategoryLabels(transactions)
 
   if (!accountId || account === undefined) return null
 
@@ -39,7 +36,7 @@ export default function AccountDetailPage() {
 
   return (
     <div className="page">
-      <PageHeader title={account.name} back />
+      <PageHeader title={account.name} back helpTopic="accounts" />
       <div className="page-body">
         <div className="account-summary">
           <span className="list-item__icon" style={{ background: `${color}22`, color }}>
@@ -77,9 +74,7 @@ export default function AccountDetailPage() {
                     <span className="list-item__text">
                       <div className="list-item__title">{t.payee}</div>
                       <div className="list-item__subtitle">
-                        {t.date} ·{' '}
-                        {categoryLabelByTransactionId?.get(t.id) ??
-                          (isIncome ? 'Income' : 'Uncategorized')}
+                        {t.date} · {isIncome ? 'Income' : 'Expense'}
                       </div>
                     </span>
                     <span className={isIncome ? 'amount-positive' : 'amount-negative'}>

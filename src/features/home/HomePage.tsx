@@ -14,7 +14,6 @@ import { db } from '../../db/db'
 import { formatCents } from '../../lib/money'
 import { computeAccountBalance } from '../accounts/balance'
 import { createTransactionFromTemplate } from '../recurring/useFromTemplate'
-import { useCategoryLabels } from '../transactions/useCategoryLabels'
 import { getIncludedAccountIds, setIncludedAccountIds } from './balanceFilter'
 
 const RECENT_LIMIT = 8
@@ -60,7 +59,6 @@ export default function HomePage() {
     [transactions],
   )
 
-  const categoryLabelByTransactionId = useCategoryLabels(recent)
   const accountNameById = new Map((accounts ?? []).map((a) => [a.id, a.name]))
 
   const totalBalance = (accounts ?? [])
@@ -147,7 +145,7 @@ export default function HomePage() {
         )}
 
         {recurringTemplates && recurringTemplates.length > 0 && (
-          <div className="category-group">
+          <div className="section-block">
             <h3>Recurring</h3>
             <div className="recurring-chips">
               {recurringTemplates.map((t) => (
@@ -171,7 +169,7 @@ export default function HomePage() {
         )}
 
         {recent && recent.length > 0 && (
-          <div className="category-group">
+          <div className="section-block">
             <h3>Recent activity</h3>
             <ul className="list">
               {recent.map((t) => {
@@ -195,8 +193,7 @@ export default function HomePage() {
                         <div className="list-item__title">{t.payee}</div>
                         <div className="list-item__subtitle">
                           {accountNameById.get(t.accountId) ?? 'Account'} ·{' '}
-                          {categoryLabelByTransactionId?.get(t.id) ??
-                            (isIncome ? 'Income' : 'Uncategorized')}
+                          {isIncome ? 'Income' : 'Expense'}
                         </div>
                       </span>
                       <span className={isIncome ? 'amount-positive' : 'amount-negative'}>
@@ -216,12 +213,6 @@ export default function HomePage() {
             <h2>No activity yet</h2>
             <p>Use the buttons above to add your first expense or income.</p>
           </div>
-        )}
-
-        {accounts && accounts.length > 0 && (
-          <Link to="/budget" className="btn btn-block">
-            View full budget
-          </Link>
         )}
       </div>
     </div>

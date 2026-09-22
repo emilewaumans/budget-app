@@ -18,15 +18,5 @@ export async function createTransactionFromTemplate(template: RecurringTemplate)
     amountCents,
   })
 
-  if (template.kind === 'expense' && template.categoryId) {
-    await db.splits.add({
-      id: crypto.randomUUID(),
-      transactionId,
-      categoryId: template.categoryId,
-      amountCents,
-      memo: '',
-    })
-  }
-
   return transactionId
 }

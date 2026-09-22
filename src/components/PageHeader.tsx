@@ -1,12 +1,14 @@
-import { ChevronLeft } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { ChevronLeft, HelpCircle } from 'lucide-react'
+import { Link, useNavigate } from 'react-router-dom'
 
 interface PageHeaderProps {
   title: string
   back?: boolean
+  /** Shows a help icon linking to that topic's explanation on the Help page. */
+  helpTopic?: string
 }
 
-export function PageHeader({ title, back = false }: PageHeaderProps) {
+export function PageHeader({ title, back = false, helpTopic }: PageHeaderProps) {
   const navigate = useNavigate()
 
   return (
@@ -22,6 +24,15 @@ export function PageHeader({ title, back = false }: PageHeaderProps) {
         </button>
       )}
       <h1>{title}</h1>
+      {helpTopic && (
+        <Link
+          to={`/help?topic=${helpTopic}`}
+          className="page-header__help"
+          aria-label="How this page works"
+        >
+          <HelpCircle size={22} />
+        </Link>
+      )}
     </header>
   )
 }

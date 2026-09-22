@@ -11,10 +11,18 @@ export default function SettingsPage() {
   const [exporting, setExporting] = useState(false)
 
   const [pinIsSet, setPinIsSet] = useState(() => hasPinSet())
+  const [showChangeForm, setShowChangeForm] = useState(false)
   const [currentPin, setCurrentPin] = useState('')
   const [newPin, setNewPin] = useState('')
   const [confirmPin, setConfirmPin] = useState('')
   const [message, setMessage] = useState<{ type: 'error' | 'success'; text: string } | null>(null)
+
+  function resetPinForm() {
+    setCurrentPin('')
+    setNewPin('')
+    setConfirmPin('')
+    setMessage(null)
+  }
 
   async function handleExport() {
     setExporting(true)
@@ -44,9 +52,8 @@ export default function SettingsPage() {
 
     await setPin(newPin)
     setPinIsSet(true)
-    setCurrentPin('')
-    setNewPin('')
-    setConfirmPin('')
+    setShowChangeForm(false)
+    resetPinForm()
     setMessage({ type: 'success', text: 'PIN saved' })
     refresh()
   }
@@ -59,76 +66,103 @@ export default function SettingsPage() {
     }
     clearPin()
     setPinIsSet(false)
-    setCurrentPin('')
+    setShowChangeForm(false)
+    resetPinForm()
     setMessage({ type: 'success', text: 'PIN removed — app lock is off' })
     refresh()
   }
 
   return (
     <div className="page">
-      <PageHeader title="Settings" back />
+      <PageHeader title="Settings" back helpTopic="settings" />
       <div className="page-body">
         <section>
           <h3>
             <Lock size={18} /> App lock
           </h3>
-          <form onSubmit={handleSavePin} className="page-body" style={{ padding: 0 }}>
-            {pinIsSet && (
-              <div className="field">
-                <label htmlFor="currentPin">Current PIN</label>
-                <input
-                  id="currentPin"
-                  type="password"
-                  inputMode="numeric"
-                  maxLength={6}
-                  value={currentPin}
-                  onChange={(e) => setCurrentPin(e.target.value)}
-                />
-              </div>
-            )}
-            <div className="field">
-              <label htmlFor="newPin">{pinIsSet ? 'New PIN' : 'PIN'}</label>
-              <input
-                id="newPin"
-                type="password"
-                inputMode="numeric"
-                maxLength={6}
-                value={newPin}
-                onChange={(e) => setNewPin(e.target.value)}
-              />
-            </div>
-            <div className="field">
-              <label htmlFor="confirmPin">Confirm PIN</label>
-              <input
-                id="confirmPin"
-                type="password"
-                inputMode="numeric"
-                maxLength={6}
-                value={confirmPin}
-                onChange={(e) => setConfirmPin(e.target.value)}
-              />
-            </div>
-
-            {message && (
-              <p className={message.type === 'error' ? 'amount-negative' : 'list-item__subtitle'}>
-                {message.text}
-              </p>
-            )}
-
-            <button type="submit" className="btn btn-primary btn-block">
-              {pinIsSet ? 'Change PIN' : 'Set PIN'}
-            </button>
-          </form>
-
-          {pinIsSet && (
-            <>
+          {pinIsSet && !showChangeForm && (
+            <div className="button-stack">
+              <button
+                type="button"
+                className="btn btn-block"
+                onClick={() => {
+                  resetPinForm()
+                  setShowChangeForm(true)
+                }}
+              >
+                <Lock size={16} /> Change PIN
+              </button>
               <button type="button" className="btn btn-danger btn-block" onClick={handleRemovePin}>
                 <Trash2 size={16} /> Remove PIN
               </button>
               <button type="button" className="btn btn-block" onClick={lockNow}>
                 <LockOpen size={16} /> Lock now
               </button>
-            </>
+            </div>
+          )}
+
+          {(!pinIsSet || showChangeForm) && (
+            <form onSubmit={handleSavePin} className="page-body" style={{ padding: 0 }}>
+              {pinIsSet && (
+                <div className="field">
+                  <label htmlFor="currentPin">Current PIN</label>
+                  <input
+                    id="currentPin"
+                    type="password"
+                    inputMode="numeric"
+                    maxLength={6}
+                    value={currentPin}
+                    onChange={(e) => setCurrentPin(e.target.value)}
+                  />
+                </div>
+              )}
+              <div className="field">
+                <label htmlFor="newPin">{pinIsSet ? 'New PIN' : 'PIN'}</label>
+                <input
+                  id="newPin"
+                  type="password"
+                  inputMode="numeric"
+                  maxLength={6}
+                  value={newPin}
+                  onChange={(e) => setNewPin(e.target.value)}
+                />
+              </div>
+              <div className="field">
+                <label htmlFor="confirmPin">Confirm PIN</label>
+                <input
+                  id="confirmPin"
+                  type="password"
+                  inputMode="numeric"
+                  maxLength={6}
+                  value={confirmPin}
+                  onChange={(e) => setConfirmPin(e.target.value)}
+                />
+              </div>
+
+              {message && (
+                <p className={message.type === 'error' ? 'amount-negative' : 'list-item__subtitle'}>
+                  {message.text}
+                </p>
+              )}
+
+              <div className="button-stack">
+                <button type="submit" className="btn btn-primary btn-block">
+                  {pinIsSet ? 'Save new PIN' : 'Set PIN'}
+                </button>
+                {pinIsSet && (
+                  <button
+                    type="button"
+                    className="btn btn-block"
+                    onClick={() => {
+                      setShowChangeForm(false)
+                      resetPinForm()
+                    }}
+                  >
+                    Cancel
+                  </button>
+                )}
+              </div>
+            </form>
           )}
         </section>
 
@@ -140,9 +174,8 @@ export default function SettingsPage() {
             <Download size={16} /> {exporting ? 'Preparing export…' : 'Export all data (CSV)'}
           </button>
           <p className="list-item__subtitle">
-            Downloads a .zip with your accounts, categories, transactions, splits, budget history,
-            savings goals, and recurring items as CSV files — your data is never locked into this
-            app.
+            Downloads a .zip with your accounts, transactions, savings goals, and recurring items
+            as CSV files — your data is never locked into this app.
           </p>
         </section>
       </div>

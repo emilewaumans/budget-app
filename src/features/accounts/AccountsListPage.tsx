@@ -17,7 +17,7 @@ export default function AccountsListPage() {
 
   return (
     <div className="page">
-      <PageHeader title="Accounts" back />
+      <PageHeader title="Accounts" back helpTopic="accounts" />
       <div className="page-body">
         {accounts && accounts.length > 0 && (
           <ul className="list">

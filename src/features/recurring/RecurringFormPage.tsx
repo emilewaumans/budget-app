@@ -18,15 +18,12 @@ export default function RecurringFormPage() {
   const [payee, setPayee] = useState('')
   const [amount, setAmount] = useState('')
   const [accountId, setAccountId] = useState('')
-  const [categoryId, setCategoryId] = useState('')
   const [memo, setMemo] = useState('')
 
   const openAccounts = useLiveQuery(
     () => db.accounts.filter((a) => !a.closed).sortBy('sortOrder'),
     [],
   )
-  const groups = useLiveQuery(() => db.categoryGroups.orderBy('sortOrder').toArray(), [])
-  const categories = useLiveQuery(() => db.categories.orderBy('sortOrder').toArray(), [])
 
   useEffect(() => {
     if (!accountId && openAccounts && openAccounts.length > 0) {
@@ -43,7 +40,6 @@ export default function RecurringFormPage() {
       setPayee(template.payee)
       setAmount(centsToInputString(template.amountCents))
       setAccountId(template.accountId)
-      setCategoryId(template.categoryId)
       setMemo(template.memo)
     })
   }, [templateId])
@@ -61,7 +57,6 @@ export default function RecurringFormPage() {
         payee: payee.trim(),
         amountCents,
         accountId,
-        categoryId: kind === 'expense' ? categoryId : '',
         memo: memo.trim(),
       })
     } else {
@@ -73,7 +68,6 @@ export default function RecurringFormPage() {
         payee: payee.trim(),
         amountCents,
         accountId,
-        categoryId: kind === 'expense' ? categoryId : '',
         memo: memo.trim(),
         sortOrder: count,
       })
@@ -145,26 +139,6 @@ export default function RecurringFormPage() {
             required
           />
         </div>
-
-        {kind === 'expense' && (
-          <div className="field">
-            <label htmlFor="category">Category</label>
-            <select id="category" value={categoryId} onChange={(e) => setCategoryId(e.target.value)}>
-              <option value="">— Uncategorized —</option>
-              {groups?.map((group) => (
-                <optgroup key={group.id} label={group.name}>
-                  {categories
-                    ?.filter((c) => c.groupId === group.id)
-                    .map((category) => (
-                      <option key={category.id} value={category.id}>
-                        {category.name}
-                      </option>
-                    ))}
-                </optgroup>
-              ))}
-            </select>
-          </div>
-        )}
 
         <div className="field">
           <label htmlFor="memo">Memo (optional)</label>

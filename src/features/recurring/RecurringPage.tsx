@@ -28,7 +28,7 @@ export default function RecurringPage() {
 
   return (
     <div className="page">
-      <PageHeader title="Recurring" back />
+      <PageHeader title="Recurring" back helpTopic="recurring" />
       <div className="page-body">
         <p className="list-item__subtitle">
           Save a payee and amount you use often, like your salary or a subscription, then add it

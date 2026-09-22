@@ -56,7 +56,7 @@ export default function GoalFormPage() {
 
   async function handleDelete() {
     if (!goalId) return
-    await db.savingsGoalMonths.where('goalId').equals(goalId).delete()
+    await db.savingsGoalContributions.where('goalId').equals(goalId).delete()
     await db.savingsGoals.delete(goalId)
     navigate('/goals')
   }
