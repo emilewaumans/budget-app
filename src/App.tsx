@@ -7,6 +7,8 @@ import BudgetPage from './features/budget/BudgetPage'
 import CategoriesPage from './features/categories/CategoriesPage'
 import CategoryFormPage from './features/categories/CategoryFormPage'
 import CategoryGroupFormPage from './features/categories/CategoryGroupFormPage'
+import GoalFormPage from './features/goals/GoalFormPage'
+import GoalsPage from './features/goals/GoalsPage'
 import HelpPage from './features/help/HelpPage'
 import HomePage from './features/home/HomePage'
 import { AppLock } from './features/lock/LockContext'
@@ -32,6 +34,7 @@ function App() {
             <Route path="/reports" element={<ReportsPage />} />
             <Route path="/more" element={<MorePage />} />
             <Route path="/categories" element={<CategoriesPage />} />
+            <Route path="/goals" element={<GoalsPage />} />
             <Route path="/settings" element={<SettingsPage />} />
           </Route>
 
@@ -50,6 +53,9 @@ function App() {
           <Route path="/categories/groups/:groupId/edit" element={<CategoryGroupFormPage />} />
           <Route path="/categories/groups/:groupId/categories/new" element={<CategoryFormPage />} />
           <Route path="/categories/:categoryId/edit" element={<CategoryFormPage />} />
+
+          <Route path="/goals/new" element={<GoalFormPage />} />
+          <Route path="/goals/:goalId/edit" element={<GoalFormPage />} />
 
           <Route path="/rules" element={<RulesPage />} />
           <Route path="/rules/new" element={<RuleFormPage />} />

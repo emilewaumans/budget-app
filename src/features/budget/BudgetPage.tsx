@@ -1,9 +1,9 @@
 import { useLiveQuery } from 'dexie-react-hooks'
-import { ChevronLeft, ChevronRight, PiggyBank, Tags } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Tags, Wallet } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { db } from '../../db/db'
-import { currentMonthKey, formatDate, formatMonthKey, shiftMonthKey } from '../../lib/dates'
+import { currentMonthKey, formatMonthKey, shiftMonthKey } from '../../lib/dates'
 import { formatCents } from '../../lib/money'
 import { AssignedInput } from './AssignedInput'
 import { computeCategorySummaries, computeReadyToAssign } from './calculations'
@@ -16,15 +16,13 @@ export default function BudgetPage() {
   const categoryMonths = useLiveQuery(() => db.categoryMonths.toArray(), [])
   const splits = useLiveQuery(() => db.splits.toArray(), [])
   const transactions = useLiveQuery(() => db.transactions.toArray(), [])
-  const goals = useLiveQuery(() => db.goals.toArray(), [])
+  const goalMonths = useLiveQuery(() => db.savingsGoalMonths.toArray(), [])
 
-  if (!groups || !categories || !categoryMonths || !splits || !transactions || !goals) return null
-
-  const goalByCategoryId = new Map(goals.map((g) => [g.categoryId, g]))
+  if (!groups || !categories || !categoryMonths || !splits || !transactions || !goalMonths) return null
 
   const transactionsById = new Map(transactions.map((t) => [t.id, t]))
   const summaries = computeCategorySummaries(categories, month, categoryMonths, splits, transactionsById)
-  const readyToAssign = computeReadyToAssign(transactions, categoryMonths)
+  const readyToAssign = computeReadyToAssign(transactions, categoryMonths, goalMonths)
   const hasCategories = groups.some((g) => categories.some((c) => c.groupId === g.id))
 
   async function setAssigned(categoryId: string, assignedCents: number) {
@@ -44,7 +42,7 @@ export default function BudgetPage() {
       <div className="page-body">
         <div className={readyToAssign < 0 ? 'ready-to-assign over' : 'ready-to-assign'}>
           <div className="ready-to-assign__icon">
-            <PiggyBank size={22} />
+            <Wallet size={22} />
           </div>
           <div className="list-item__subtitle">Ready to Assign</div>
           <h2>{formatCents(readyToAssign)}</h2>
@@ -97,10 +95,6 @@ export default function BudgetPage() {
                     spentCents: 0,
                     availableCents: 0,
                   }
-                  const goal = goalByCategoryId.get(category.id)
-                  const progressPct = goal
-                    ? Math.min(100, Math.max(0, (summary.availableCents / goal.targetCents) * 100))
-                    : 0
                   return (
                     <li key={category.id} className="category-item">
                       <div className="category-row">
@@ -113,17 +107,6 @@ export default function BudgetPage() {
                           {formatCents(summary.availableCents)}
                         </span>
                       </div>
-                      {goal && (
-                        <div className="goal-progress">
-                          <div className="goal-progress__bar">
-                            <div className="goal-progress__fill" style={{ width: `${progressPct}%` }} />
-                          </div>
-                          <div className="goal-progress__label">
-                            {formatCents(summary.availableCents)} of {formatCents(goal.targetCents)} by{' '}
-                            {formatDate(goal.targetDate)}
-                          </div>
-                        </div>
-                      )}
                     </li>
                   )
                 })}

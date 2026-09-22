@@ -5,8 +5,9 @@ import type {
   CategoryGroup,
   CategoryMonth,
   CategorizationRule,
-  Goal,
   RecurringTemplate,
+  SavingsGoal,
+  SavingsGoalMonth,
   Split,
   Transaction,
 } from './types'
@@ -19,8 +20,9 @@ class BudgetDB extends Dexie {
   transactions!: EntityTable<Transaction, 'id'>
   splits!: EntityTable<Split, 'id'>
   rules!: EntityTable<CategorizationRule, 'id'>
-  goals!: EntityTable<Goal, 'id'>
   recurringTemplates!: EntityTable<RecurringTemplate, 'id'>
+  savingsGoals!: EntityTable<SavingsGoal, 'id'>
+  savingsGoalMonths!: EntityTable<SavingsGoalMonth, 'id'>
 
   constructor() {
     super('budgetdb')
@@ -46,6 +48,22 @@ class BudgetDB extends Dexie {
       rules: 'id, matchText, categoryId, priority',
       goals: 'id, categoryId',
       recurringTemplates: 'id, sortOrder',
+    })
+
+    // Savings goals become their own concept (see SavingsGoal in types.ts) instead of living
+    // on a category, so the old category-linked `goals` store is dropped here.
+    this.version(3).stores({
+      accounts: 'id, name, type, closed, sortOrder',
+      categoryGroups: 'id, name, sortOrder',
+      categories: 'id, groupId, name, sortOrder',
+      categoryMonths: 'id, [categoryId+month], month',
+      transactions: 'id, accountId, date, payee, cleared',
+      splits: 'id, transactionId, categoryId',
+      rules: 'id, matchText, categoryId, priority',
+      goals: null,
+      recurringTemplates: 'id, sortOrder',
+      savingsGoals: 'id, sortOrder',
+      savingsGoalMonths: 'id, [goalId+month], month',
     })
   }
 }

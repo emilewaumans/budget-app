@@ -5,20 +5,32 @@ import { centsToDecimalString } from '../../lib/money'
 import { toCsv } from './csv'
 
 async function buildExportZip(): Promise<Blob> {
-  const [accounts, categoryGroups, categories, transactions, splits, categoryMonths, goals] =
-    await Promise.all([
-      db.accounts.toArray(),
-      db.categoryGroups.toArray(),
-      db.categories.toArray(),
-      db.transactions.toArray(),
-      db.splits.toArray(),
-      db.categoryMonths.toArray(),
-      db.goals.toArray(),
-    ])
+  const [
+    accounts,
+    categoryGroups,
+    categories,
+    transactions,
+    splits,
+    categoryMonths,
+    savingsGoals,
+    savingsGoalMonths,
+    recurringTemplates,
+  ] = await Promise.all([
+    db.accounts.toArray(),
+    db.categoryGroups.toArray(),
+    db.categories.toArray(),
+    db.transactions.toArray(),
+    db.splits.toArray(),
+    db.categoryMonths.toArray(),
+    db.savingsGoals.toArray(),
+    db.savingsGoalMonths.toArray(),
+    db.recurringTemplates.toArray(),
+  ])
 
   const accountNameById = new Map(accounts.map((a) => [a.id, a.name]))
   const groupNameById = new Map(categoryGroups.map((g) => [g.id, g.name]))
   const categoryNameById = new Map(categories.map((c) => [c.id, c.name]))
+  const goalNameById = new Map(savingsGoals.map((g) => [g.id, g.name]))
 
   const zip = new JSZip()
 
@@ -81,14 +93,43 @@ async function buildExportZip(): Promise<Blob> {
   )
 
   zip.file(
-    'goals.csv',
+    'savings_goals.csv',
     toCsv(
-      ['category', 'target_amount', 'target_date', 'note'],
-      goals.map((g) => [
-        categoryNameById.get(g.categoryId) ?? '',
+      ['id', 'name', 'target_amount', 'target_date', 'note'],
+      savingsGoals.map((g) => [
+        g.id,
+        g.name,
         centsToDecimalString(g.targetCents),
         g.targetDate,
         g.note,
+      ]),
+    ),
+  )
+
+  zip.file(
+    'savings_goal_contributions.csv',
+    toCsv(
+      ['month', 'goal', 'assigned'],
+      savingsGoalMonths.map((gm) => [
+        gm.month,
+        goalNameById.get(gm.goalId) ?? '',
+        centsToDecimalString(gm.assignedCents),
+      ]),
+    ),
+  )
+
+  zip.file(
+    'recurring_templates.csv',
+    toCsv(
+      ['name', 'kind', 'payee', 'amount', 'account', 'category', 'memo'],
+      recurringTemplates.map((t) => [
+        t.name,
+        t.kind,
+        t.payee,
+        centsToDecimalString(t.amountCents),
+        accountNameById.get(t.accountId) ?? '',
+        categoryNameById.get(t.categoryId) ?? '',
+        t.memo,
       ]),
     ),
   )

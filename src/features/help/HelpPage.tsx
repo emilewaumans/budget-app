@@ -64,9 +64,7 @@ export default function HelpPage() {
         </section>
 
         <section>
-          <h3>
-            <PiggyBank size={20} /> The Budget screen (like envelopes of cash)
-          </h3>
+          <h3>The Budget screen (like envelopes of cash)</h3>
           <p>
             Imagine putting cash into separate envelopes each month — one for groceries, one for
             electricity, and so on. The Budget screen works the same way, just on your phone.
@@ -75,6 +73,19 @@ export default function HelpPage() {
             <strong>"Ready to Assign"</strong> is money you've received but haven't put into an
             envelope yet. Once you put money into a category, it stays there — even when the
             month changes — until you actually spend it. It never just disappears.
+          </p>
+        </section>
+
+        <section>
+          <h3>
+            <PiggyBank size={20} /> Savings Goals
+          </h3>
+          <p>
+            This is a different, happier kind of envelope — for something you're looking forward
+            to, like a new watch or a vacation, not a bill. It works the same way as a budget
+            category (you set money aside for it a little at a time, and it never resets), but it
+            lives on its own screen under <strong>More → Savings Goals</strong> so it never gets
+            mixed in with your everyday spending.
           </p>
         </section>
 

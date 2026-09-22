@@ -63,13 +63,28 @@ export interface CategorizationRule {
   priority: number
 }
 
-export interface Goal {
+/**
+ * A savings goal (e.g. "New watch", "Vacation") — deliberately its own concept, not a
+ * spending category. It works like an envelope (assign money to it, it rolls over) but is
+ * never mixed into the spending-category list, and nothing is ever "spent" from it in-app.
+ */
+export interface SavingsGoal {
   id: string
-  categoryId: string
+  name: string
   targetCents: number
   /** Format: 'YYYY-MM-DD' */
   targetDate: string
   note: string
+  sortOrder: number
+}
+
+/** One row per goal per month — mirrors CategoryMonth so goals share the same assign/rollover mechanic. */
+export interface SavingsGoalMonth {
+  id: string
+  goalId: string
+  /** Format: 'YYYY-MM' */
+  month: string
+  assignedCents: number
 }
 
 export type TransactionKind = 'expense' | 'income'

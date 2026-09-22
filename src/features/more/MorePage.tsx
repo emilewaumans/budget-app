@@ -1,4 +1,4 @@
-import { HelpCircle, Repeat, Settings, Tags } from 'lucide-react'
+import { HelpCircle, PiggyBank, Repeat, Settings, Tags } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 export default function MorePage() {
@@ -21,6 +21,17 @@ export default function MorePage() {
             </Link>
           </li>
           <li>
+            <Link className="list-item" to="/goals">
+              <span className="list-item__icon">
+                <PiggyBank size={20} />
+              </span>
+              <span className="list-item__text">
+                <div className="list-item__title">Savings Goals</div>
+                <div className="list-item__subtitle">Set money aside for something you want</div>
+              </span>
+            </Link>
+          </li>
+          <li>
             <Link className="list-item" to="/recurring">
               <span className="list-item__icon">
                 <Repeat size={20} />
@@ -38,7 +49,7 @@ export default function MorePage() {
               </span>
               <span className="list-item__text">
                 <div className="list-item__title">Categories</div>
-                <div className="list-item__subtitle">Groups, categories, and rules</div>
+                <div className="list-item__subtitle">Groups, categories, and rules for spending</div>
               </span>
             </Link>
           </li>

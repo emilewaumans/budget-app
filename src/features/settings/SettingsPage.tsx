@@ -142,7 +142,8 @@ export default function SettingsPage() {
           </button>
           <p className="list-item__subtitle">
             Downloads a .zip with your accounts, categories, transactions, splits, budget history,
-            and goals as CSV files — your data is never locked into this app.
+            savings goals, and recurring items as CSV files — your data is never locked into this
+            app.
           </p>
         </section>
       </div>

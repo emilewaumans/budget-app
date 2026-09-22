@@ -289,6 +289,54 @@ a {
   font-size: 2.25rem;
 }
 
+.home-balance__filter-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+}
+
+.balance-filter {
+  margin: 0.75rem auto 0;
+  max-width: 260px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  text-align: left;
+}
+
+.balance-filter__row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  font: inherit;
+  color: var(--text-h);
+  cursor: pointer;
+}
+
+.balance-filter__check {
+  width: 20px;
+  height: 20px;
+  border-radius: 5px;
+  border: 1.5px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.balance-filter__check.checked {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
 .home-add-buttons {
   display: grid;
   grid-template-columns: 1fr 1fr;

@@ -1,4 +1,4 @@
-import type { Category, CategoryMonth, Split, Transaction } from '../../db/types'
+import type { Category, CategoryMonth, SavingsGoalMonth, Split, Transaction } from '../../db/types'
 
 export interface CategorySummary {
   /** Money assigned to this category for the viewed month only. */
@@ -19,18 +19,22 @@ function monthOf(dateISO: string): string {
 
 /**
  * Ready to Assign is every euro that has come in as income but hasn't yet
- * been given a job (assigned to a category), across all months — not just
- * income you've already spent from. It goes negative if you've assigned
- * more than you've actually received.
+ * been given a job — assigned to a category OR put toward a savings goal,
+ * across all months — not just income you've already spent from. It goes
+ * negative if you've assigned more than you've actually received. Categories
+ * and goals draw from this one shared pool, so both are counted here.
  */
 export function computeReadyToAssign(
   transactions: Transaction[],
   categoryMonths: CategoryMonth[],
+  goalMonths: SavingsGoalMonth[] = [],
 ): number {
   const totalIncome = transactions
     .filter((t) => t.amountCents > 0)
     .reduce((sum, t) => sum + t.amountCents, 0)
-  const totalAssigned = categoryMonths.reduce((sum, cm) => sum + cm.assignedCents, 0)
+  const totalAssigned =
+    categoryMonths.reduce((sum, cm) => sum + cm.assignedCents, 0) +
+    goalMonths.reduce((sum, gm) => sum + gm.assignedCents, 0)
   return totalIncome - totalAssigned
 }
 

@@ -1,5 +1,13 @@
 import { useLiveQuery } from 'dexie-react-hooks'
-import { ArrowDownLeft, ArrowUpRight, HelpCircle, Receipt, Wallet } from 'lucide-react'
+import {
+  ArrowDownLeft,
+  ArrowUpRight,
+  Check,
+  HelpCircle,
+  Receipt,
+  SlidersHorizontal,
+  Wallet,
+} from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { db } from '../../db/db'
@@ -7,12 +15,15 @@ import { formatCents } from '../../lib/money'
 import { computeAccountBalance } from '../accounts/balance'
 import { createTransactionFromTemplate } from '../recurring/useFromTemplate'
 import { useCategoryLabels } from '../transactions/useCategoryLabels'
+import { getIncludedAccountIds, setIncludedAccountIds } from './balanceFilter'
 
 const RECENT_LIMIT = 8
 
 export default function HomePage() {
   const navigate = useNavigate()
   const [usingId, setUsingId] = useState<string | null>(null)
+  const [filterOpen, setFilterOpen] = useState(false)
+  const [includedIds, setIncludedIds] = useState<string[] | null>(() => getIncludedAccountIds())
 
   const accounts = useLiveQuery(
     () => db.accounts.filter((a) => !a.closed).sortBy('sortOrder'),
@@ -23,6 +34,19 @@ export default function HomePage() {
     () => db.recurringTemplates.orderBy('sortOrder').toArray(),
     [],
   )
+
+  function isIncluded(accountId: string): boolean {
+    return includedIds === null || includedIds.includes(accountId)
+  }
+
+  function toggleAccount(accountId: string) {
+    const current = includedIds ?? (accounts ?? []).map((a) => a.id)
+    const next = current.includes(accountId)
+      ? current.filter((id) => id !== accountId)
+      : [...current, accountId]
+    setIncludedIds(next)
+    setIncludedAccountIds(next)
+  }
 
   // Memoized so this array's identity only changes when `transactions` itself changes —
   // otherwise useCategoryLabels' internal useLiveQuery would see a "new" input every render
@@ -39,10 +63,9 @@ export default function HomePage() {
   const categoryLabelByTransactionId = useCategoryLabels(recent)
   const accountNameById = new Map((accounts ?? []).map((a) => [a.id, a.name]))
 
-  const totalBalance = (accounts ?? []).reduce(
-    (sum, account) => sum + computeAccountBalance(account, transactions ?? []),
-    0,
-  )
+  const totalBalance = (accounts ?? [])
+    .filter((account) => isIncluded(account.id))
+    .reduce((sum, account) => sum + computeAccountBalance(account, transactions ?? []), 0)
 
   async function handleUseTemplate(templateId: string) {
     const template = await db.recurringTemplates.get(templateId)
@@ -66,10 +89,39 @@ export default function HomePage() {
       </header>
       <div className="page-body">
         <div className="home-balance">
-          <div className="list-item__subtitle">Total balance</div>
+          <button
+            type="button"
+            className="home-balance__filter-toggle"
+            onClick={() => setFilterOpen((open) => !open)}
+          >
+            <span className="list-item__subtitle">Total balance</span>
+            {accounts && accounts.length > 1 && <SlidersHorizontal size={14} />}
+          </button>
           <h2 className={totalBalance < 0 ? 'amount-negative' : undefined}>
             {formatCents(totalBalance)}
           </h2>
+
+          {filterOpen && accounts && accounts.length > 1 && (
+            <div className="balance-filter">
+              {accounts.map((account) => (
+                <button
+                  key={account.id}
+                  type="button"
+                  className="balance-filter__row"
+                  onClick={() => toggleAccount(account.id)}
+                >
+                  <span
+                    className={
+                      isIncluded(account.id) ? 'balance-filter__check checked' : 'balance-filter__check'
+                    }
+                  >
+                    {isIncluded(account.id) && <Check size={14} color="#fff" strokeWidth={3} />}
+                  </span>
+                  {account.name}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="home-add-buttons">

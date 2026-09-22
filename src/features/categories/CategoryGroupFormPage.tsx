@@ -47,7 +47,6 @@ export default function CategoryGroupFormPage() {
     if (!groupId || !categoryIds) return
     await db.splits.where('categoryId').anyOf(categoryIds).delete()
     await db.categoryMonths.where('categoryId').anyOf(categoryIds).delete()
-    await db.goals.where('categoryId').anyOf(categoryIds).delete()
     await db.categories.where('groupId').equals(groupId).delete()
     await db.categoryGroups.delete(groupId)
     navigate('/categories')

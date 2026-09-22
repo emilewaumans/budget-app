@@ -8,7 +8,7 @@ const TABS = [
   { to: '/reports', label: 'Reports', Icon: BarChart3 },
 ]
 
-const MORE_PATHS = ['/more', '/categories', '/settings']
+const MORE_PATHS = ['/more', '/categories', '/settings', '/goals']
 
 export function MainLayout() {
   const location = useLocation()
