@@ -1,5 +1,6 @@
 import { Download, Lock, LockOpen, Trash2 } from 'lucide-react'
 import { useState } from 'react'
+import { PageHeader } from '../../components/PageHeader'
 import { downloadExportZip } from '../export/exportData'
 import { clearPin, hasPinSet, setPin, verifyPin } from '../lock/pin'
 import { useLock } from '../lock/LockContext'
@@ -65,9 +66,7 @@ export default function SettingsPage() {
 
   return (
     <div className="page">
-      <header className="page-header">
-        <h1>Settings</h1>
-      </header>
+      <PageHeader title="Settings" back />
       <div className="page-body">
         <section>
           <h3>

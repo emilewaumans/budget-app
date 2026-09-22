@@ -2,6 +2,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { ChevronLeft, ChevronRight, Tags, Wallet } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { PageHeader } from '../../components/PageHeader'
 import { db } from '../../db/db'
 import { currentMonthKey, formatMonthKey, shiftMonthKey } from '../../lib/dates'
 import { formatCents } from '../../lib/money'
@@ -36,9 +37,7 @@ export default function BudgetPage() {
 
   return (
     <div className="page">
-      <header className="page-header">
-        <h1>Budget</h1>
-      </header>
+      <PageHeader title="Budget" back />
       <div className="page-body">
         <div className={readyToAssign < 0 ? 'ready-to-assign over' : 'ready-to-assign'}>
           <div className="ready-to-assign__icon">

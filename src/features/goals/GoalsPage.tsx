@@ -116,7 +116,7 @@ export default function GoalsPage() {
         )}
       </div>
       {goals.length > 0 && (
-        <Link to="/goals/new" className="fab" aria-label="Add savings goal">
+        <Link to="/goals/new" className="fab fab--above-nav" aria-label="Add savings goal">
           <Plus size={26} />
         </Link>
       )}

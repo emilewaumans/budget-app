@@ -782,6 +782,31 @@ section h3 {
   color: var(--positive);
 }
 
+.more-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.more-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 100px;
+  border-radius: 16px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-align: center;
+  padding: 1rem 0.75rem;
+}
+
+.more-card--editing {
+  gap: 0.6rem;
+}
+
 .recurring-row {
   display: flex;
   align-items: stretch;

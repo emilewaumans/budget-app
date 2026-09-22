@@ -17,7 +17,7 @@ export default function AccountsListPage() {
 
   return (
     <div className="page">
-      <PageHeader title="Accounts" />
+      <PageHeader title="Accounts" back />
       <div className="page-body">
         {accounts && accounts.length > 0 && (
           <ul className="list">
@@ -56,7 +56,7 @@ export default function AccountsListPage() {
           </div>
         )}
       </div>
-      <Link to="/accounts/new" className="fab fab--above-nav" aria-label="Add account">
+      <Link to="/accounts/new" className="fab" aria-label="Add account">
         <Plus size={26} />
       </Link>
     </div>

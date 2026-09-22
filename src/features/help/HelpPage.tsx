@@ -48,7 +48,8 @@ export default function HelpPage() {
           <p>
             An "account" is simply a place where your money is — your bank account, a savings
             account, or cash in your wallet. You can add more than one, and each shows its own
-            balance (how much money is in it right now).
+            balance (how much money is in it right now). Find your accounts under{' '}
+            <strong>More → Accounts</strong>.
           </p>
         </section>
 
@@ -60,11 +61,12 @@ export default function HelpPage() {
             A "category" is a label for what you spent money on, like "Groceries" or
             "Electricity". It helps you see where your money goes. You don't have to pick one
             every time — if you're in a hurry, leaving it as "Uncategorized" is perfectly fine.
+            Manage them under <strong>More → Categories</strong>.
           </p>
         </section>
 
         <section>
-          <h3>The Budget screen (like envelopes of cash)</h3>
+          <h3>The Budget screen (like envelopes of cash), under More → Budget</h3>
           <p>
             Imagine putting cash into separate envelopes each month — one for groceries, one for
             electricity, and so on. The Budget screen works the same way, just on your phone.
@@ -84,8 +86,8 @@ export default function HelpPage() {
             This is a different, happier kind of envelope — for something you're looking forward
             to, like a new watch or a vacation, not a bill. It works the same way as a budget
             category (you set money aside for it a little at a time, and it never resets), but it
-            lives on its own screen under <strong>More → Savings Goals</strong> so it never gets
-            mixed in with your everyday spending.
+            has its own tab at the bottom of the screen so it never gets mixed in with your
+            everyday spending.
           </p>
         </section>
 
@@ -94,8 +96,8 @@ export default function HelpPage() {
             <BarChart3 size={20} /> Reports
           </h3>
           <p>
-            The Reports tab shows simple bar charts: how much you spent in each category, and how
-            your spending compares month to month.
+            Under <strong>More → Reports</strong> you'll find simple bar charts: how much you
+            spent in each category, and how your spending compares month to month.
           </p>
         </section>
 

@@ -29,14 +29,15 @@ function App() {
           <Route element={<MainLayout />}>
             <Route path="/" element={<Navigate to="/home" replace />} />
             <Route path="/home" element={<HomePage />} />
-            <Route path="/budget" element={<BudgetPage />} />
-            <Route path="/accounts" element={<AccountsListPage />} />
-            <Route path="/reports" element={<ReportsPage />} />
-            <Route path="/more" element={<MorePage />} />
-            <Route path="/categories" element={<CategoriesPage />} />
             <Route path="/goals" element={<GoalsPage />} />
-            <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/more" element={<MorePage />} />
           </Route>
+
+          <Route path="/budget" element={<BudgetPage />} />
+          <Route path="/accounts" element={<AccountsListPage />} />
+          <Route path="/reports" element={<ReportsPage />} />
+          <Route path="/categories" element={<CategoriesPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
 
           <Route path="/transactions/new" element={<TransactionFormPage />} />
 

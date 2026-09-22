@@ -1,6 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { ChevronLeft, ChevronRight, PieChart } from 'lucide-react'
 import { useState } from 'react'
+import { PageHeader } from '../../components/PageHeader'
 import { db } from '../../db/db'
 import { currentMonthKey, formatMonthKey, lastNMonthKeys, shiftMonthKey } from '../../lib/dates'
 import { formatCents } from '../../lib/money'
@@ -25,9 +26,7 @@ export default function ReportsPage() {
 
   return (
     <div className="page">
-      <header className="page-header">
-        <h1>Reports</h1>
-      </header>
+      <PageHeader title="Reports" back />
       <div className="page-body">
         <div className="month-nav">
           <button type="button" onClick={() => setMonth(shiftMonthKey(month, -1))} aria-label="Previous month">

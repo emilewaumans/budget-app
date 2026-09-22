@@ -1,6 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { FolderOpen, Plus, SlidersHorizontal, Tags } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { PageHeader } from '../../components/PageHeader'
 import { db } from '../../db/db'
 
 export default function CategoriesPage() {
@@ -9,9 +10,7 @@ export default function CategoriesPage() {
 
   return (
     <div className="page">
-      <header className="page-header">
-        <h1>Categories</h1>
-      </header>
+      <PageHeader title="Categories" back />
       <div className="page-body">
         <Link to="/rules" className="btn">
           <SlidersHorizontal size={16} /> Categorization rules
@@ -57,7 +56,7 @@ export default function CategoriesPage() {
           </div>
         )}
       </div>
-      <Link to="/categories/groups/new" className="fab fab--above-nav" aria-label="Add category group">
+      <Link to="/categories/groups/new" className="fab" aria-label="Add category group">
         <Plus size={26} />
       </Link>
     </div>

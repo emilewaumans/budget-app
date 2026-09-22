@@ -1,70 +1,88 @@
-import { HelpCircle, PiggyBank, Repeat, Settings, Tags } from 'lucide-react'
+import {
+  BarChart3,
+  Check,
+  HelpCircle,
+  Landmark,
+  Repeat,
+  Settings,
+  Tags,
+  Wallet,
+} from 'lucide-react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { ColorSwatchPicker } from '../../components/ColorSwatchPicker'
+import { nextPaletteColor, PALETTE_COLORS } from '../../lib/palette'
+import { getMoreItemColors, setMoreItemColors } from './moreColors'
+
+const MORE_ITEMS = [
+  { id: 'budget', label: 'Budget', to: '/budget', Icon: Wallet },
+  { id: 'accounts', label: 'Accounts', to: '/accounts', Icon: Landmark },
+  { id: 'reports', label: 'Reports', to: '/reports', Icon: BarChart3 },
+  { id: 'categories', label: 'Categories', to: '/categories', Icon: Tags },
+  { id: 'recurring', label: 'Recurring', to: '/recurring', Icon: Repeat },
+  { id: 'help', label: 'How this app works', to: '/help', Icon: HelpCircle },
+  { id: 'settings', label: 'Settings', to: '/settings', Icon: Settings },
+]
 
 export default function MorePage() {
+  const [editMode, setEditMode] = useState(false)
+  const [colors, setColors] = useState<Record<string, string>>(() => getMoreItemColors())
+
+  function colorFor(id: string, index: number): string {
+    return colors[id] ?? nextPaletteColor(index)
+  }
+
+  function setColor(id: string, color: string) {
+    const next = { ...colors, [id]: color }
+    setColors(next)
+    setMoreItemColors(next)
+  }
+
   return (
     <div className="page">
       <header className="page-header">
         <h1>More</h1>
+        <button
+          type="button"
+          className="page-header__help"
+          onClick={() => setEditMode((v) => !v)}
+          aria-label={editMode ? 'Done customizing colors' : 'Customize colors'}
+        >
+          {editMode ? <Check size={22} /> : <Settings size={22} />}
+        </button>
       </header>
       <div className="page-body">
-        <ul className="list">
-          <li>
-            <Link className="list-item" to="/help">
-              <span className="list-item__icon">
-                <HelpCircle size={20} />
-              </span>
-              <span className="list-item__text">
-                <div className="list-item__title">How this app works</div>
-                <div className="list-item__subtitle">A simple guide to every feature</div>
-              </span>
-            </Link>
-          </li>
-          <li>
-            <Link className="list-item" to="/goals">
-              <span className="list-item__icon">
-                <PiggyBank size={20} />
-              </span>
-              <span className="list-item__text">
-                <div className="list-item__title">Savings Goals</div>
-                <div className="list-item__subtitle">Set money aside for something you want</div>
-              </span>
-            </Link>
-          </li>
-          <li>
-            <Link className="list-item" to="/recurring">
-              <span className="list-item__icon">
-                <Repeat size={20} />
-              </span>
-              <span className="list-item__text">
-                <div className="list-item__title">Recurring</div>
-                <div className="list-item__subtitle">Salary, subscriptions, and other repeats</div>
-              </span>
-            </Link>
-          </li>
-          <li>
-            <Link className="list-item" to="/categories">
-              <span className="list-item__icon">
-                <Tags size={20} />
-              </span>
-              <span className="list-item__text">
-                <div className="list-item__title">Categories</div>
-                <div className="list-item__subtitle">Groups, categories, and rules for spending</div>
-              </span>
-            </Link>
-          </li>
-          <li>
-            <Link className="list-item" to="/settings">
-              <span className="list-item__icon">
-                <Settings size={20} />
-              </span>
-              <span className="list-item__text">
-                <div className="list-item__title">Settings</div>
-                <div className="list-item__subtitle">App lock and data export</div>
-              </span>
-            </Link>
-          </li>
-        </ul>
+        {editMode && (
+          <p className="list-item__subtitle">Tap a color to change that button's color.</p>
+        )}
+
+        <div className="more-grid">
+          {MORE_ITEMS.map((item, index) => {
+            const color = colorFor(item.id, index)
+            const style = { background: `${color}22`, color }
+
+            if (editMode) {
+              return (
+                <div key={item.id} className="more-card more-card--editing" style={style}>
+                  <item.Icon size={24} />
+                  <span>{item.label}</span>
+                  <ColorSwatchPicker
+                    colors={PALETTE_COLORS}
+                    value={color}
+                    onChange={(c) => setColor(item.id, c)}
+                  />
+                </div>
+              )
+            }
+
+            return (
+              <Link key={item.id} to={item.to} className="more-card" style={style}>
+                <item.Icon size={24} />
+                <span>{item.label}</span>
+              </Link>
+            )
+          })}
+        </div>
       </div>
     </div>
   )
