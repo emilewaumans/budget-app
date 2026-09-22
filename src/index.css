@@ -49,6 +49,7 @@ body {
   width: 100%;
   height: 100vh;
   height: 100dvh;
+  height: var(--app-height, 100dvh); /* set by JS from window.innerHeight — more reliable than dvh on iOS PWAs */
   display: flex;
   flex-direction: column;
   overflow: hidden;

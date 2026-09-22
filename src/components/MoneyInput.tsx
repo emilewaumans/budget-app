@@ -1,3 +1,5 @@
+import { parseToCents } from '../lib/money'
+
 interface MoneyInputProps {
   id: string
   label: string
@@ -16,6 +18,9 @@ export function MoneyInput({ id, label, value, onChange }: MoneyInputProps) {
         inputMode="decimal"
         placeholder="0,00"
         value={value}
+        onFocus={(e) => {
+          if (parseToCents(e.target.value) === 0) onChange('')
+        }}
         onChange={(e) => onChange(e.target.value)}
       />
     </div>

@@ -313,6 +313,9 @@ export default function TransactionFormPage() {
                   type="text"
                   inputMode="decimal"
                   value={row.amount}
+                  onFocus={(e) => {
+                    if (parseToCents(e.target.value) === 0) updateRow(row.key, { amount: '' })
+                  }}
                   onChange={(e) => updateRow(row.key, { amount: e.target.value })}
                 />
                 <button

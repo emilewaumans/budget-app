@@ -16,7 +16,7 @@ export function AssignedInput({ value, onCommit }: AssignedInputProps) {
       type="text"
       inputMode="decimal"
       value={draft ?? centsToInputString(value)}
-      onFocus={() => setDraft(centsToInputString(value))}
+      onFocus={() => setDraft(value === 0 ? '' : centsToInputString(value))}
       onChange={(e) => setDraft(e.target.value)}
       onBlur={() => {
         if (draft !== null) onCommit(parseToCents(draft))
