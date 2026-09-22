@@ -1,5 +1,6 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { ArrowDownLeft, ArrowUpRight, Receipt, Wallet } from 'lucide-react'
+import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { db } from '../../db/db'
 import { formatCents } from '../../lib/money'
@@ -15,10 +16,17 @@ export default function HomePage() {
   )
   const transactions = useLiveQuery(() => db.transactions.toArray(), [])
 
-  const recent = transactions
-    ?.slice()
-    .sort((a, b) => b.date.localeCompare(a.date))
-    .slice(0, RECENT_LIMIT)
+  // Memoized so this array's identity only changes when `transactions` itself changes —
+  // otherwise useCategoryLabels' internal useLiveQuery would see a "new" input every render
+  // and re-run forever, pegging the CPU and making the whole page feel frozen.
+  const recent = useMemo(
+    () =>
+      transactions
+        ?.slice()
+        .sort((a, b) => b.date.localeCompare(a.date))
+        .slice(0, RECENT_LIMIT),
+    [transactions],
+  )
 
   const categoryLabelByTransactionId = useCategoryLabels(recent)
   const accountNameById = new Map((accounts ?? []).map((a) => [a.id, a.name]))
