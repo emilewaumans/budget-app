@@ -1,13 +1,15 @@
-import { Download, Lock, LockOpen, Trash2 } from 'lucide-react'
+import { Download, Lock, LockOpen, Monitor, Moon, Sun, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { PageHeader } from '../../components/PageHeader'
 import { downloadExportZip } from '../export/exportData'
 import { clearPin, hasPinSet, setPin, verifyPin } from '../lock/pin'
 import { useLock } from '../lock/LockContext'
+import { getTheme, setTheme, type Theme } from '../../lib/theme'
 
 export default function SettingsPage() {
   const { refresh, lockNow } = useLock()
 
+  const [theme, setThemeState] = useState<Theme>(() => getTheme())
   const [exporting, setExporting] = useState(false)
 
   const [pinIsSet, setPinIsSet] = useState(() => hasPinSet())
@@ -72,10 +74,44 @@ export default function SettingsPage() {
     refresh()
   }
 
+  function handleThemeChange(next: Theme) {
+    setThemeState(next)
+    setTheme(next)
+  }
+
   return (
     <div className="page">
       <PageHeader title="Settings" back helpTopic="settings" />
       <div className="page-body">
+        <section>
+          <h3>
+            <Sun size={18} /> Appearance
+          </h3>
+          <div className="segmented">
+            <button
+              type="button"
+              className={theme === 'system' ? 'active' : undefined}
+              onClick={() => handleThemeChange('system')}
+            >
+              <Monitor size={16} /> System
+            </button>
+            <button
+              type="button"
+              className={theme === 'light' ? 'active' : undefined}
+              onClick={() => handleThemeChange('light')}
+            >
+              <Sun size={16} /> Light
+            </button>
+            <button
+              type="button"
+              className={theme === 'dark' ? 'active' : undefined}
+              onClick={() => handleThemeChange('dark')}
+            >
+              <Moon size={16} /> Dark
+            </button>
+          </div>
+        </section>
+
         <section>
           <h3>
             <Lock size={18} /> App lock

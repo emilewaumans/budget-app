@@ -40,8 +40,12 @@
   -webkit-font-smoothing: antialiased;
 }
 
+/*
+ * Dark values apply either from the OS setting (when no manual override is set) or from the
+ * manual override in Settings, via a `data-theme` attribute the theme module sets on <html>.
+ */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme='light']) {
     --bg: #000;
     --surface: #1c1c1e;
     --surface-2: #2c2c2e;
@@ -60,7 +64,36 @@
     --positive-bg: rgba(48, 209, 88, 0.16);
     --negative: #ff453a;
     --negative-bg: rgba(255, 69, 58, 0.16);
+
+    color-scheme: dark;
   }
+}
+
+:root[data-theme='dark'] {
+  --bg: #000;
+  --surface: #1c1c1e;
+  --surface-2: #2c2c2e;
+
+  --text-h: #fff;
+  --text: rgba(235, 235, 245, 0.6);
+  --text-muted: rgba(235, 235, 245, 0.3);
+
+  --border: rgba(84, 84, 88, 0.65);
+  --fill: rgba(120, 120, 128, 0.32);
+
+  --accent: #a78bfa;
+  --accent-bg: rgba(167, 139, 250, 0.16);
+
+  --positive: #30d158;
+  --positive-bg: rgba(48, 209, 88, 0.16);
+  --negative: #ff453a;
+  --negative-bg: rgba(255, 69, 58, 0.16);
+
+  color-scheme: dark;
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
 }
 
 @media (prefers-contrast: more) {
@@ -581,6 +614,18 @@ textarea:focus {
 
 .payee-input input {
   padding-right: 2.75rem;
+}
+
+.payee-input__switch {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  padding: 0;
+  margin-top: -0.1rem;
+  color: var(--accent);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
 }
 
 .payee-input__save {

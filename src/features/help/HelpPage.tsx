@@ -122,6 +122,10 @@ const TOPICS: Topic[] = [
     content: (
       <>
         <p>
+          Under <strong>Appearance</strong>, choose Light, Dark, or System (which follows your
+          phone's own setting).
+        </p>
+        <p>
           You can set a PIN code, like on a bank card, so no one else can open the app — tap{' '}
           <strong>Change PIN</strong> to set, change, or remove it.
         </p>
