@@ -15,7 +15,7 @@ export default function GoalsPage() {
 
   return (
     <div className="page">
-      <header className="page-header">
+      <header className="page-header page-header--large">
         <h1>Savings Goals</h1>
         <Link to="/help?topic=goals" className="page-header__help" aria-label="How this page works">
           <HelpCircle size={22} />
@@ -44,7 +44,7 @@ export default function GoalsPage() {
               const reached = savedCents >= goal.targetCents
               return (
                 <li key={goal.id} className="assign-item">
-                  <Link to={`/goals/${goal.id}`} className="list-item" style={{ padding: 0 }}>
+                  <Link to={`/goals/${goal.id}`} className="list-item list-item--flush">
                     <span className="list-item__title">{goal.name}</span>
                     <span className={savedCents < 0 ? 'amount-negative' : 'amount-positive'}>
                       {formatCents(savedCents)}

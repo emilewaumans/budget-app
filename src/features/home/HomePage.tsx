@@ -79,7 +79,7 @@ export default function HomePage() {
 
   return (
     <div className="page">
-      <header className="page-header">
+      <header className="page-header page-header--large">
         <h1>Home</h1>
         <Link to="/help" className="page-header__help" aria-label="How this app works">
           <HelpCircle size={22} />

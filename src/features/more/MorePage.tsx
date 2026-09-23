@@ -29,7 +29,7 @@ export default function MorePage() {
 
   return (
     <div className="page">
-      <header className="page-header">
+      <header className="page-header page-header--large">
         <h1>More</h1>
         <div className="page-header__actions">
           <Link to="/help?topic=more" aria-label="How this page works">
