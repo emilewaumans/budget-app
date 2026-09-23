@@ -11,6 +11,8 @@ import HelpPage from './features/help/HelpPage'
 import HomePage from './features/home/HomePage'
 import { AppLock } from './features/lock/LockContext'
 import MorePage from './features/more/MorePage'
+import PayeeFormPage from './features/payees/PayeeFormPage'
+import PayeesPage from './features/payees/PayeesPage'
 import RecurringFormPage from './features/recurring/RecurringFormPage'
 import RecurringPage from './features/recurring/RecurringPage'
 import ReportsPage from './features/reports/ReportsPage'
@@ -58,6 +60,10 @@ function App() {
           <Route path="/recurring" element={<RecurringPage />} />
           <Route path="/recurring/new" element={<RecurringFormPage />} />
           <Route path="/recurring/:templateId/edit" element={<RecurringFormPage />} />
+
+          <Route path="/payees" element={<PayeesPage />} />
+          <Route path="/payees/new" element={<PayeeFormPage />} />
+          <Route path="/payees/:payeeId/edit" element={<PayeeFormPage />} />
         </Routes>
       </HashRouter>
     </AppLock>

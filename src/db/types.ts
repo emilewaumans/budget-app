@@ -50,6 +50,12 @@ export interface SavingsGoalContribution {
   note: string
 }
 
+/** A saved payee (e.g. "Colruyt", "My Employer") people can pick instead of retyping. */
+export interface Payee {
+  id: string
+  name: string
+}
+
 export type TransactionKind = 'expense' | 'income'
 
 /** A saved template (e.g. "Salary", "Netflix") that pre-fills a new transaction in one tap. */

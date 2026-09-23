@@ -1,5 +1,5 @@
 import { useLiveQuery } from 'dexie-react-hooks'
-import { HelpCircle, PiggyBank, Plus } from 'lucide-react'
+import { HelpCircle, Minus, PiggyBank, Plus } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { db } from '../../db/db'
 import { formatCents } from '../../lib/money'
@@ -37,28 +37,46 @@ export default function GoalsPage() {
         )}
 
         {goals.length > 0 && (
-          <ul className="list">
+          <ul className="goal-cards">
             {goals.map((goal) => {
               const savedCents = savedByGoal.get(goal.id) ?? 0
               const progressPct = Math.min(100, Math.max(0, (savedCents / goal.targetCents) * 100))
               const reached = savedCents >= goal.targetCents
               return (
-                <li key={goal.id} className="assign-item">
-                  <Link to={`/goals/${goal.id}`} className="list-item list-item--flush">
-                    <span className="list-item__title">{goal.name}</span>
-                    <span className={savedCents < 0 ? 'amount-negative' : 'amount-positive'}>
-                      {formatCents(savedCents)}
-                    </span>
+                <li key={goal.id} className="goal-card">
+                  <Link to={`/goals/${goal.id}`} className="goal-card__info">
+                    <div className="goal-card__header">
+                      <span className="list-item__title">{goal.name}</span>
+                      <span className={savedCents < 0 ? 'amount-negative' : 'amount-positive'}>
+                        {formatCents(savedCents)}
+                      </span>
+                    </div>
+                    <div className="goal-progress">
+                      <div className="goal-progress__bar">
+                        <div className="goal-progress__fill" style={{ width: `${progressPct}%` }} />
+                      </div>
+                      <div className="goal-progress__label">
+                        {reached
+                          ? `Reached! ${formatCents(goal.targetCents)} goal`
+                          : `${formatCents(savedCents)} of ${formatCents(goal.targetCents)}`}
+                      </div>
+                    </div>
                   </Link>
-                  <div className="goal-progress">
-                    <div className="goal-progress__bar">
-                      <div className="goal-progress__fill" style={{ width: `${progressPct}%` }} />
-                    </div>
-                    <div className="goal-progress__label">
-                      {reached
-                        ? `Reached! ${formatCents(goal.targetCents)} goal`
-                        : `${formatCents(savedCents)} of ${formatCents(goal.targetCents)}`}
-                    </div>
+                  <div className="goal-card__actions">
+                    <Link
+                      to={`/goals/${goal.id}/contributions/new?kind=withdraw`}
+                      className="goal-card__action goal-card__action--minus"
+                      aria-label={`Take money out of ${goal.name}`}
+                    >
+                      <Minus size={16} strokeWidth={2.5} />
+                    </Link>
+                    <Link
+                      to={`/goals/${goal.id}/contributions/new?kind=deposit`}
+                      className="goal-card__action goal-card__action--plus"
+                      aria-label={`Add money to ${goal.name}`}
+                    >
+                      <Plus size={22} strokeWidth={2.5} />
+                    </Link>
                   </div>
                 </li>
               )

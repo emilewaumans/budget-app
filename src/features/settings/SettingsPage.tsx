@@ -174,8 +174,8 @@ export default function SettingsPage() {
             <Download size={16} /> {exporting ? 'Preparing export…' : 'Export all data (CSV)'}
           </button>
           <p className="list-item__subtitle">
-            Downloads a .zip with your accounts, transactions, savings goals, and recurring items
-            as CSV files — your data is never locked into this app.
+            Downloads a .zip with your accounts, transactions, savings goals, recurring items, and
+            payees as CSV files — your data is never locked into this app.
           </p>
         </section>
       </div>

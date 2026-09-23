@@ -1,6 +1,6 @@
 import { ArrowDownLeft, ArrowUpRight, Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { MoneyInput } from '../../components/MoneyInput'
 import { PageHeader } from '../../components/PageHeader'
 import { db } from '../../db/db'
@@ -11,10 +11,13 @@ type ContributionKind = 'deposit' | 'withdraw'
 
 export default function ContributionFormPage() {
   const { goalId, contributionId } = useParams()
+  const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const isEditing = Boolean(contributionId)
 
-  const [kind, setKind] = useState<ContributionKind>('deposit')
+  const [kind, setKind] = useState<ContributionKind>(
+    searchParams.get('kind') === 'withdraw' ? 'withdraw' : 'deposit',
+  )
   const [amount, setAmount] = useState('')
   const [date, setDate] = useState(todayISO())
   const [note, setNote] = useState('')

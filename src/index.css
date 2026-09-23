@@ -326,14 +326,6 @@ a.list-item::after {
   transform: translateY(-50%) rotate(45deg);
 }
 
-a.list-item.list-item--flush {
-  padding: 0;
-}
-
-a.list-item.list-item--flush::after {
-  content: none;
-}
-
 .list-item__icon {
   display: flex;
   align-items: center;
@@ -583,6 +575,31 @@ textarea:focus {
   outline-offset: -1px;
 }
 
+.payee-input {
+  position: relative;
+}
+
+.payee-input input {
+  padding-right: 2.75rem;
+}
+
+.payee-input__save {
+  position: absolute;
+  right: 0.4rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 999px;
+  background: var(--accent-bg);
+  color: var(--accent);
+  cursor: pointer;
+}
+
 .segmented {
   display: flex;
   background: var(--fill);
@@ -751,13 +768,72 @@ textarea:focus {
   text-decoration: none;
 }
 
-.assign-item {
-  padding: 0.9rem 1rem;
-  border-bottom: 0.5px solid var(--border);
+/* Savings goal cards */
+
+.goal-cards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
 }
 
-.assign-item:last-child {
-  border-bottom: none;
+.goal-card {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 0 0 0.5px var(--border);
+  padding: 1rem;
+}
+
+.goal-card__info {
+  flex: 1;
+  min-width: 0;
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.goal-card__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.goal-card__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-shrink: 0;
+}
+
+.goal-card__action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.goal-card__action--minus {
+  width: 32px;
+  height: 32px;
+  background: var(--fill);
+  color: var(--text);
+}
+
+.goal-card__action--plus {
+  width: 44px;
+  height: 44px;
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
 }
 
 .goal-progress {

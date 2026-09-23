@@ -1,4 +1,4 @@
-import { BarChart3, Check, HelpCircle, Landmark, Repeat, Settings } from 'lucide-react'
+import { BarChart3, Check, HelpCircle, Landmark, Repeat, Settings, Users } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ColorSwatchPicker } from '../../components/ColorSwatchPicker'
@@ -7,6 +7,7 @@ import { getMoreItemColors, setMoreItemColors } from './moreColors'
 
 const MORE_ITEMS = [
   { id: 'accounts', label: 'Accounts', to: '/accounts', Icon: Landmark },
+  { id: 'payees', label: 'Payees', to: '/payees', Icon: Users },
   { id: 'reports', label: 'Reports', to: '/reports', Icon: BarChart3 },
   { id: 'recurring', label: 'Recurring', to: '/recurring', Icon: Repeat },
   { id: 'help', label: 'How this app works', to: '/help', Icon: HelpCircle },

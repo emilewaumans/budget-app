@@ -6,6 +6,7 @@ import {
   MoreHorizontal,
   PiggyBank,
   Repeat,
+  Users,
 } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { useSearchParams } from 'react-router-dom'
@@ -44,6 +45,19 @@ const TOPICS: Topic[] = [
         account, or cash in your wallet. You can add more than one under{' '}
         <strong>More → Accounts</strong>, and each shows its own balance (how much money is in it
         right now).
+      </p>
+    ),
+  },
+  {
+    id: 'payees',
+    title: 'Payees',
+    Icon: Users,
+    content: (
+      <p>
+        A payee is who you paid or who paid you. Save one under <strong>More → Payees</strong>{' '}
+        and it shows up as a suggestion the next time you type a similar name — or tap the
+        bookmark icon next to the Payee field while adding a transaction to save whatever you
+        just typed.
       </p>
     ),
   },

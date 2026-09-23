@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { MoneyInput } from '../../components/MoneyInput'
 import { PageHeader } from '../../components/PageHeader'
+import { PayeeInput } from '../../components/PayeeInput'
 import { db } from '../../db/db'
 import type { TransactionKind } from '../../db/types'
 import { todayISO } from '../../lib/dates'
@@ -55,11 +56,6 @@ export default function TransactionFormPage() {
   }, [isEditing, transactionId])
 
   const accountId = accountIdFromRoute ?? selectedAccountId
-
-  const payeeSuggestions = useLiveQuery(async () => {
-    const all = await db.transactions.orderBy('date').reverse().toArray()
-    return Array.from(new Set(all.map((t) => t.payee).filter(Boolean)))
-  }, [])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -140,20 +136,7 @@ export default function TransactionFormPage() {
 
         <MoneyInput id="amount" label="Amount" value={amount} onChange={setAmount} />
 
-        <div className="field">
-          <label htmlFor="payee">Payee</label>
-          <input
-            id="payee"
-            value={payee}
-            onChange={(e) => setPayee(e.target.value)}
-            list="payee-suggestions"
-            placeholder="e.g. Colruyt"
-            required
-          />
-          <datalist id="payee-suggestions">
-            {payeeSuggestions?.map((p) => <option key={p} value={p} />)}
-          </datalist>
-        </div>
+        <PayeeInput id="payee" label="Payee" value={payee} onChange={setPayee} required />
 
         <div className="field">
           <label htmlFor="date">Date</label>

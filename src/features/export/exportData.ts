@@ -5,13 +5,14 @@ import { centsToDecimalString } from '../../lib/money'
 import { toCsv } from './csv'
 
 async function buildExportZip(): Promise<Blob> {
-  const [accounts, transactions, savingsGoals, savingsGoalContributions, recurringTemplates] =
+  const [accounts, transactions, savingsGoals, savingsGoalContributions, recurringTemplates, payees] =
     await Promise.all([
       db.accounts.toArray(),
       db.transactions.toArray(),
       db.savingsGoals.toArray(),
       db.savingsGoalContributions.toArray(),
       db.recurringTemplates.toArray(),
+      db.payees.toArray(),
     ])
 
   const accountNameById = new Map(accounts.map((a) => [a.id, a.name]))
@@ -84,6 +85,8 @@ async function buildExportZip(): Promise<Blob> {
       ]),
     ),
   )
+
+  zip.file('payees.csv', toCsv(['id', 'name'], payees.map((p) => [p.id, p.name])))
 
   return zip.generateAsync({ type: 'blob' })
 }
