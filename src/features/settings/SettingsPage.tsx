@@ -1,7 +1,13 @@
-import { Download, Lock, LockOpen, Monitor, Moon, Sun, Trash2 } from 'lucide-react'
-import { useState } from 'react'
+import { Download, Lock, LockOpen, Monitor, Moon, ScanFace, Sun, Trash2 } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { PageHeader } from '../../components/PageHeader'
 import { downloadExportZip } from '../export/exportData'
+import {
+  clearFaceId,
+  hasFaceIdRegistered,
+  isPlatformAuthenticatorAvailable,
+  registerFaceId,
+} from '../lock/faceId'
 import { clearPin, hasPinSet, setPin, verifyPin } from '../lock/pin'
 import { useLock } from '../lock/LockContext'
 import { getTheme, setTheme, type Theme } from '../../lib/theme'
@@ -11,6 +17,15 @@ export default function SettingsPage() {
 
   const [theme, setThemeState] = useState<Theme>(() => getTheme())
   const [exporting, setExporting] = useState(false)
+
+  const [faceIdAvailable, setFaceIdAvailable] = useState(false)
+  const [faceIdEnabled, setFaceIdEnabled] = useState(() => hasFaceIdRegistered())
+  const [faceIdBusy, setFaceIdBusy] = useState(false)
+  const [faceIdError, setFaceIdError] = useState<string | null>(null)
+
+  useEffect(() => {
+    isPlatformAuthenticatorAvailable().then(setFaceIdAvailable)
+  }, [])
 
   const [pinIsSet, setPinIsSet] = useState(() => hasPinSet())
   const [showChangeForm, setShowChangeForm] = useState(false)
@@ -67,6 +82,8 @@ export default function SettingsPage() {
       return
     }
     clearPin()
+    clearFaceId()
+    setFaceIdEnabled(false)
     setPinIsSet(false)
     setShowChangeForm(false)
     resetPinForm()
@@ -77,6 +94,24 @@ export default function SettingsPage() {
   function handleThemeChange(next: Theme) {
     setThemeState(next)
     setTheme(next)
+  }
+
+  async function handleEnableFaceId() {
+    setFaceIdBusy(true)
+    setFaceIdError(null)
+    try {
+      await registerFaceId()
+      setFaceIdEnabled(true)
+    } catch {
+      setFaceIdError('Could not set up Face ID on this device.')
+    } finally {
+      setFaceIdBusy(false)
+    }
+  }
+
+  function handleDisableFaceId() {
+    clearFaceId()
+    setFaceIdEnabled(false)
   }
 
   return (
@@ -128,6 +163,21 @@ export default function SettingsPage() {
               >
                 <Lock size={16} /> Change PIN
               </button>
+              {faceIdAvailable &&
+                (faceIdEnabled ? (
+                  <button type="button" className="btn btn-block" onClick={handleDisableFaceId}>
+                    <ScanFace size={16} /> Turn off Face ID
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    className="btn btn-block"
+                    onClick={handleEnableFaceId}
+                    disabled={faceIdBusy}
+                  >
+                    <ScanFace size={16} /> {faceIdBusy ? 'Setting up…' : 'Set up Face ID'}
+                  </button>
+                ))}
               <button type="button" className="btn btn-danger btn-block" onClick={handleRemovePin}>
                 <Trash2 size={16} /> Remove PIN
               </button>
@@ -136,6 +186,8 @@ export default function SettingsPage() {
               </button>
             </div>
           )}
+
+          {faceIdError && <p className="amount-negative">{faceIdError}</p>}
 
           {(!pinIsSet || showChangeForm) && (
             <form onSubmit={handleSavePin} className="page-body" style={{ padding: 0 }}>

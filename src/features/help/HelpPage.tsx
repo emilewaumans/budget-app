@@ -127,7 +127,9 @@ const TOPICS: Topic[] = [
         </p>
         <p>
           You can set a PIN code, like on a bank card, so no one else can open the app — tap{' '}
-          <strong>Change PIN</strong> to set, change, or remove it.
+          <strong>Change PIN</strong> to set, change, or remove it. Once a PIN is set, devices
+          that support it can also offer <strong>Set up Face ID</strong> so unlocking is one tap
+          instead of typing — your PIN still works as a backup.
         </p>
         <p>
           You can also download a copy of everything in the app as a .zip of CSV files (for
