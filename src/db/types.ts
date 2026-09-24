@@ -58,6 +58,9 @@ export interface Payee {
 
 export type TransactionKind = 'expense' | 'income'
 
+export type RecurringPeriodKind = 'daily' | 'weekly' | 'monthly' | 'halfYear' | 'yearly' | 'custom'
+export type CustomPeriodUnit = 'days' | 'weeks' | 'months'
+
 /** A saved template (e.g. "Salary", "Netflix") that pre-fills a new transaction in one tap. */
 export interface RecurringTemplate {
   id: string
@@ -68,4 +71,9 @@ export interface RecurringTemplate {
   accountId: string
   memo: string
   sortOrder: number
+  /** How often this recurs. Older templates predate this field — treat missing as 'monthly'. */
+  periodKind?: RecurringPeriodKind
+  /** Only meaningful when periodKind is 'custom', e.g. count 3, unit 'weeks' -> "every 3 weeks". */
+  customPeriodCount?: number
+  customPeriodUnit?: CustomPeriodUnit
 }

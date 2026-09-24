@@ -97,9 +97,12 @@ const TOPICS: Topic[] = [
     content: (
       <p>
         If you log the same thing often, like your salary or a subscription, save it once under{' '}
-        <strong>More → Recurring</strong>. After that it shows up as a one-tap button on the Home
-        screen — tap it and today's entry is created instantly, ready for you to double check
-        before you move on.
+        <strong>More → Recurring</strong> — including how often it repeats (daily, weekly,
+        monthly, every 6 months, yearly, or a custom interval like "every 3 weeks"). After that
+        it shows up as a one-tap button on the Home screen — tap it and today's entry is created
+        instantly, ready for you to double check before you move on. Nothing is added
+        automatically on a schedule; the period is just there so you remember how often each one
+        comes around.
       </p>
     ),
   },

@@ -1,5 +1,6 @@
 import JSZip from 'jszip'
 import { db } from '../../db/db'
+import { formatPeriod } from '../recurring/period'
 import { todayISO } from '../../lib/dates'
 import { centsToDecimalString } from '../../lib/money'
 import { toCsv } from './csv'
@@ -74,7 +75,7 @@ async function buildExportZip(): Promise<Blob> {
   zip.file(
     'recurring_templates.csv',
     toCsv(
-      ['name', 'kind', 'payee', 'amount', 'account', 'memo'],
+      ['name', 'kind', 'payee', 'amount', 'account', 'memo', 'repeats'],
       recurringTemplates.map((t) => [
         t.name,
         t.kind,
@@ -82,6 +83,7 @@ async function buildExportZip(): Promise<Blob> {
         centsToDecimalString(t.amountCents),
         accountNameById.get(t.accountId) ?? '',
         t.memo,
+        formatPeriod(t.periodKind, t.customPeriodCount, t.customPeriodUnit),
       ]),
     ),
   )

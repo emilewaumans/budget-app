@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { PageHeader } from '../../components/PageHeader'
 import { db } from '../../db/db'
 import { formatCents } from '../../lib/money'
+import { formatPeriod } from './period'
 import { createTransactionFromTemplate } from './useFromTemplate'
 
 export default function RecurringPage() {
@@ -54,7 +55,8 @@ export default function RecurringPage() {
                     <span className="list-item__text">
                       <div className="list-item__title">{t.name}</div>
                       <div className="list-item__subtitle">
-                        {accountNameById.get(t.accountId) ?? 'Account'} · {t.payee}
+                        {accountNameById.get(t.accountId) ?? 'Account'} · {t.payee} ·{' '}
+                        {formatPeriod(t.periodKind, t.customPeriodCount, t.customPeriodUnit)}
                       </div>
                     </span>
                     <span className={isIncome ? 'amount-positive' : 'amount-negative'}>

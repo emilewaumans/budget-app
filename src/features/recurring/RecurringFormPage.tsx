@@ -4,9 +4,12 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { MoneyInput } from '../../components/MoneyInput'
 import { PageHeader } from '../../components/PageHeader'
+import { PeriodInput, type PeriodValue } from '../../components/PeriodInput'
 import { db } from '../../db/db'
 import type { TransactionKind } from '../../db/types'
 import { centsToInputString, parseToCents } from '../../lib/money'
+
+const DEFAULT_PERIOD: PeriodValue = { kind: 'monthly', customCount: 1, customUnit: 'months' }
 
 export default function RecurringFormPage() {
   const { templateId } = useParams()
@@ -19,6 +22,7 @@ export default function RecurringFormPage() {
   const [amount, setAmount] = useState('')
   const [accountId, setAccountId] = useState('')
   const [memo, setMemo] = useState('')
+  const [period, setPeriod] = useState<PeriodValue>(DEFAULT_PERIOD)
 
   const openAccounts = useLiveQuery(
     () => db.accounts.filter((a) => !a.closed).sortBy('sortOrder'),
@@ -41,6 +45,11 @@ export default function RecurringFormPage() {
       setAmount(centsToInputString(template.amountCents))
       setAccountId(template.accountId)
       setMemo(template.memo)
+      setPeriod({
+        kind: template.periodKind ?? 'monthly',
+        customCount: template.customPeriodCount ?? 1,
+        customUnit: template.customPeriodUnit ?? 'months',
+      })
     })
   }, [templateId])
 
@@ -58,6 +67,9 @@ export default function RecurringFormPage() {
         amountCents,
         accountId,
         memo: memo.trim(),
+        periodKind: period.kind,
+        customPeriodCount: period.customCount,
+        customPeriodUnit: period.customUnit,
       })
     } else {
       const count = await db.recurringTemplates.count()
@@ -70,6 +82,9 @@ export default function RecurringFormPage() {
         accountId,
         memo: memo.trim(),
         sortOrder: count,
+        periodKind: period.kind,
+        customPeriodCount: period.customCount,
+        customPeriodUnit: period.customUnit,
       })
     }
     navigate(-1)
@@ -128,6 +143,8 @@ export default function RecurringFormPage() {
         </div>
 
         <MoneyInput id="amount" label="Amount" value={amount} onChange={setAmount} />
+
+        <PeriodInput value={period} onChange={setPeriod} />
 
         <div className="field">
           <label htmlFor="payee">Payee</label>

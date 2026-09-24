@@ -645,6 +645,19 @@ textarea:focus {
   cursor: pointer;
 }
 
+.period-custom {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.period-custom input {
+  flex: 0 0 5rem;
+}
+
+.period-custom select {
+  flex: 1;
+}
+
 .segmented {
   display: flex;
   background: var(--fill);
